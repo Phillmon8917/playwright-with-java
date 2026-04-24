@@ -1,0 +1,40 @@
+#!/bin/sh
+
+JAVA_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "^src/main/.*\.java$")
+
+if [ -z "$JAVA_FILES" ]; then
+    echo "No src/main Java files staged. Skipping checks."
+    exit 0
+fi
+
+FAILED=0
+
+for FILE in $JAVA_FILES; do
+    if [ ! -f "$FILE" ]; then
+        continue
+    fi
+    
+    if grep -n "System\.out\.println" "$FILE"; then
+        echo "❌ [$FILE] Remove System.out.println - use a logger instead"
+        FAILED=1
+    fi
+    
+done
+
+echo ""
+echo "Running cspell on staged Java files..."
+echo "$JAVA_FILES" | xargs npx cspell --no-summary
+if [ $? -ne 0 ]; then
+    echo "❌ Spelling errors found. Add custom words to your cspell config words[]"
+    FAILED=1
+fi
+
+if [ "$FAILED" -eq 1 ]; then
+    echo ""
+    echo "❌ Pre-commit checks failed. Fix the issues above before committing."
+    exit 1
+fi
+
+echo ""
+echo "✅ All pre-commit checks passed."
+exit 0

@@ -1,0 +1,26 @@
+{
+  "name": "playwright-framework-java",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Phillmon8917/playwright-with-java.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Phillmon8917/playwright-with-java/issues"
+  },
+  "homepage": "https://github.com/Phillmon8917/playwright-with-java#readme",
+  "devDependencies": {
+    "cspell": "^10.0.0",
+    "husky": "^9.1.7"
+  }
+}

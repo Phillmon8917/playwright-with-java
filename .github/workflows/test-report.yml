@@ -1,0 +1,247 @@
+name: Regression Tests
+
+permissions:
+  contents: write
+  actions: write
+  pages: write
+  id-token: write
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Test tag to run"
+        required: false
+        default: "regression"
+        type: choice
+        options:
+          - regression
+          - sanity
+          - guest
+          - authentication
+          - customer
+          - agent
+          - admin
+      base_url:
+        description: "Base URL"
+        required: false
+        default: ""
+      action_timeout:
+        description: "Action timeout (ms)"
+        required: false
+        default: ""
+      navigation_timeout:
+        description: "Navigation timeout (ms)"
+        required: false
+        default: ""
+      test_timeout:
+        description: "Test timeout (ms)"
+        required: false
+        default: ""
+
+jobs:
+  authenticate:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      CUSTOMER_USERNAME: ${{ secrets.CUSTOMER_USERNAME }}
+      CUSTOMER_PASSWORD: ${{ secrets.CUSTOMER_PASSWORD }}
+      AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
+      AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
+      BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Install Playwright browsers
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+
+      - name: Run authentication
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="authentication"
+
+      - name: Upload storage state
+        uses: actions/upload-artifact@v4
+        with:
+          name: storage-state
+          path: storage/
+          retention-days: 1
+
+  test-shard:
+    needs: authenticate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+    env:
+      CI: true
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      CUSTOMER_USERNAME: ${{ secrets.CUSTOMER_USERNAME }}
+      CUSTOMER_PASSWORD: ${{ secrets.CUSTOMER_PASSWORD }}
+      AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
+      AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
+      BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Install Playwright browsers
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+
+      - name: Download storage state
+        uses: actions/download-artifact@v4
+        with:
+          name: storage-state
+          path: storage/
+
+      - name: Run shard ${{ matrix.shard }}
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="${{ inputs.tag != '' && inputs.tag || 'regression' }} & shard${{ matrix.shard }}"
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-shard-${{ matrix.shard }}
+          path: target/allure-results/
+          retention-days: 1
+
+  build-report:
+    needs: test-shard
+    runs-on: ubuntu-latest
+    if: always()
+    env:
+      CI: true
+      DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
+      DATA_REPO_OWNER: Phillmon8917
+      DATA_REPO_NAME: phptravels-reports
+      DATA_REPO_BRANCH: java-reports
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Download all Allure results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: allure-results-shard-*
+          merge-multiple: true
+          path: target/allure-results/
+
+      - name: Generate Allure report
+        run: mvn allure:report
+
+      - name: Build monthly report
+        run: mvn exec:java -Dexec.mainClass=report.BuildReport
+
+      - name: Set report date
+        run: echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_ENV
+
+      - name: Assemble Pages directory
+        run: |
+          mkdir -p gh-pages/monthly-report
+          mkdir -p gh-pages/allure-report
+          cp src/dist/report.html gh-pages/monthly-report/index.html
+          cp -r target/site/allure-maven-plugin/. gh-pages/allure-report/
+
+          cat > gh-pages/index.html << 'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <title>Java QA Dashboard</title>
+            <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+            <style>
+              :root { --bg:#0b0d12; --surface:#111318; --border:#1f2330; --accent:#4fffb0; --text:#e8eaf0; --muted:#6b7080; }
+              * { box-sizing:border-box; margin:0; padding:0; }
+              body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif;
+                     min-height:100vh; display:flex; flex-direction:column;
+                     align-items:center; justify-content:center; padding:48px 24px; }
+              .badge { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.2em;
+                       text-transform:uppercase; color:var(--accent);
+                       background:rgba(79,255,176,.08); border:1px solid rgba(79,255,176,.2);
+                       padding:4px 14px; border-radius:2px; margin-bottom:24px; }
+              h1 { font-family:'Syne',sans-serif; font-size:clamp(32px,6vw,56px);
+                   font-weight:800; letter-spacing:-.03em; text-align:center; margin-bottom:12px; }
+              h1 span { color:var(--accent); }
+              .sub { color:var(--muted); font-size:15px; text-align:center; margin-bottom:56px; }
+              .cards { display:flex; gap:24px; flex-wrap:wrap; justify-content:center; }
+              .card { background:var(--surface); border:1px solid var(--border); border-radius:12px;
+                      padding:32px 28px; text-decoration:none; color:inherit; width:320px;
+                      transition:transform .2s,border-color .2s; position:relative; overflow:hidden; }
+              .card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent); }
+              .card:hover { transform:translateY(-4px); border-color:#3a3f50; }
+              .card-icon { font-size:32px; margin-bottom:16px; }
+              .card-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-bottom:8px; }
+              .card-desc { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:24px; }
+              .card-link { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.1em;
+                           text-transform:uppercase; color:var(--accent); }
+              .footer { margin-top:56px; font-family:'DM Mono',monospace; font-size:11px;
+                        color:var(--muted); text-align:center; line-height:1.8; }
+              .footer span { color:var(--accent); }
+            </style>
+          </head>
+          <body>
+            <div class="badge">QA Automation · Java · PHPTRAVELS</div>
+            <h1>Java Test <span>Dashboard</span></h1>
+            <p class="sub">Monthly QA reports for the Java Playwright suite.</p>
+            <div class="cards">
+              <a href="./monthly-report/index.html" class="card">
+                <div class="card-icon">📊</div>
+                <div class="card-title">Monthly QA Report</div>
+                <div class="card-desc">Trends, pass rates, run history and insights across the full month.</div>
+                <div class="card-link">View report →</div>
+              </a>
+              <a href="./allure-report/index.html" class="card">
+                <div class="card-icon">🧪</div>
+                <div class="card-title">Allure Test Report</div>
+                <div class="card-desc">Full test results with logs, screenshots, videos and step details.</div>
+                <div class="card-link">View report →</div>
+              </a>
+            </div>
+            <div class="footer">
+              Generated ${{ env.REPORT_DATE }} &nbsp;·&nbsp; Branch: <span>java-reports</span>
+            </div>
+          </body>
+          </html>
+          HTML
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: gh-pages/
+          keep_files: false

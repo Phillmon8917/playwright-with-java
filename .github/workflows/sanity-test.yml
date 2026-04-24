@@ -1,0 +1,94 @@
+name: Sanity Tests
+
+permissions:
+  contents: write
+  actions: write
+  pages: write
+  id-token: write
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+    - cron: "0 13 * * *"
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Test tag to run"
+        required: false
+        default: "sanity"
+        type: choice
+        options:
+          - sanity
+          - guest
+          - authentication
+          - customer
+          - agent
+          - admin
+          - regression
+      base_url:
+        description: "Base URL"
+        required: false
+        default: ""
+      action_timeout:
+        description: "Action timeout (ms)"
+        required: false
+        default: ""
+      navigation_timeout:
+        description: "Navigation timeout (ms)"
+        required: false
+        default: ""
+      test_timeout:
+        description: "Test timeout (ms)"
+        required: false
+        default: ""
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      CUSTOMER_USERNAME: ${{ secrets.CUSTOMER_USERNAME }}
+      CUSTOMER_PASSWORD: ${{ secrets.CUSTOMER_PASSWORD }}
+      AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
+      AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
+      BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Install Playwright browsers
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+
+      - name: Run authentication first
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="authentication"
+
+      - name: Run sanity tests
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="${{ inputs.tag != '' && inputs.tag || 'sanity' }}"
+
+      - name: Generate Allure report
+        if: always()
+        run: mvn allure:report
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-sanity
+          path: target/site/allure-maven-plugin/
+          retention-days: 7

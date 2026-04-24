@@ -1,0 +1,52 @@
+name: PR Branch Rules Enforcement
+
+on:
+  pull_request:
+    branches:
+      - "**"
+    types: [opened, synchronize, reopened]
+
+jobs:
+  branch-validation:
+    name: branch-validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Validate PR branches
+        shell: bash
+        run: |
+          echo "Starting PR branch validation..."
+
+          SOURCE_BRANCH="${{ github.event.pull_request.head.ref }}"
+          DEST_BRANCH="${{ github.event.pull_request.base.ref }}"
+
+          echo "Source: $SOURCE_BRANCH"
+          echo "Destination: $DEST_BRANCH"
+
+          fail() { echo "❌ ERROR: $1"; exit 1; }
+
+          if [[ "$SOURCE_BRANCH" != "develop" && "$SOURCE_BRANCH" != "qa" && "$SOURCE_BRANCH" != "main" ]]; then
+            if [[ ! "$SOURCE_BRANCH" =~ ^(feature|bugfix|hotfix)/ ]]; then
+              fail "Branch '$SOURCE_BRANCH' is invalid. New branches must start with 'feature/', 'bugfix/', or 'hotfix/'."
+            fi
+          fi
+
+          if [[ "$SOURCE_BRANCH" =~ ^(feature|bugfix|hotfix)/ ]] && [[ "$DEST_BRANCH" != "develop" ]]; then
+            fail "Branch '$SOURCE_BRANCH' must target 'develop'. PRs from feature/bugfix/hotfix branches cannot target '$DEST_BRANCH'."
+          fi
+
+          if [[ "$SOURCE_BRANCH" == "develop" ]] && [[ "$DEST_BRANCH" != "qa" ]]; then
+            fail "Branch 'develop' must target 'qa'. PRs from 'develop' to '$DEST_BRANCH' are not allowed."
+          fi
+
+          if [[ "$SOURCE_BRANCH" == "qa" ]] && [[ "$DEST_BRANCH" != "main" ]]; then
+            fail "Branch 'qa' must target 'main'. PRs from 'qa' to '$DEST_BRANCH' are not allowed."
+          fi
+
+          if [[ "$SOURCE_BRANCH" == "main" ]]; then
+            fail "Direct PRs from 'main' are blocked. Changes must flow from 'qa' → 'main'."
+          fi
+
+          echo "✅ PR branch rules ran successfully."

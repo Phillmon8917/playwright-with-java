@@ -18,10 +18,23 @@ public class DateUtil {
         return getFormattedDate(LocalDate.now(), "dd-MM-yyyy");
     }
 
+    /**
+     * Formats the current date using the supplied pattern.
+     *
+     * @param format the output format pattern to apply
+     * @return the formatted current date
+     */
     public static String getFormattedDate(String format) {
         return getFormattedDate(LocalDate.now(), format);
     }
 
+    /**
+     * Formats the supplied date using the provided pattern tokens.
+     *
+     * @param date the date to format
+     * @param format the output format pattern to apply
+     * @return the formatted date string
+     */
     public static String getFormattedDate(LocalDate date, String format) {
 
         String day = String.format("%02d", date.getDayOfMonth());

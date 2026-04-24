@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QA Monthly Report</title>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap"
+            rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0b0d12;
+            --surface: #111318;
+            --surface2: #181b22;
+            --border: #1f2330;
+            --accent: #4fffb0;
+            --accent2: #7b6fff;
+            --accent3: #ff6b6b;
+            --accent4: #ffd166;
+            --text: #e8eaf0;
+            --text-muted: #6b7080;
+            --text-dim: #3a3f50;
+            --pass: #4fffb0;
+            --fail: #ff6b6b;
+            --skip: #ffd166;
+            --timeout: #ff9f43;
+            --new: #7b6fff;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        .report-header {
+            position: relative;
+            overflow: hidden;
+            padding: 60px 48px 48px;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(ellipse 80% 60% at 60% -10%, rgba(75, 255, 176, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 90% 80%, rgba(123, 111, 255, 0.06) 0%, transparent 60%),
+                var(--surface);
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: start;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .report-badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: rgba(79, 255, 176, 0.08);
+            border: 1px solid rgba(79, 255, 176, 0.2);
+            padding: 4px 12px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .report-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: var(--text);
+        }
+
+        .report-title span {
+            color: var(--accent);
+        }
+
+        .report-subtitle {
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-size: 15px;
+            max-width: 520px;
+            line-height: 1.7;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+            min-width: 200px;
+        }
+
+        .meta-chip {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 100px;
+            white-space: nowrap;
+        }
+
+        .meta-chip strong {
+            color: var(--text);
+        }
+
+        .meta-chip.tester-chip {
+            border-color: rgba(79, 255, 176, 0.3);
+            background: rgba(79, 255, 176, 0.06);
+        }
+
+        .meta-chip.tester-chip strong {
+            color: var(--accent);
+        }
+
+        .header-divider {
+            margin: 40px auto 0;
+            max-width: 1400px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .health-bar-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            white-space: nowrap;
+        }
+
+        .health-bar-track {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--pass), var(--accent2));
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .health-pct {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--accent);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 48px;
+        }
+
+        .section-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── KPI CARDS ── */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--text-dim);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+
+        .kpi-card.pass::before {
+            background: var(--pass);
+        }
+
+        .kpi-card.fail::before {
+            background: var(--fail);
+        }
+
+        .kpi-card.skip::before {
+            background: var(--skip);
+        }
+
+        .kpi-card.total::before {
+            background: var(--accent2);
+        }
+
+        .kpi-card.new-tests::before {
+            background: var(--new);
+        }
+
+        .kpi-card.runs::before {
+            background: var(--accent4);
+        }
+
+        .kpi-card.duration::before {
+            background: var(--timeout);
+        }
+
+        .kpi-icon {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .kpi-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .kpi-card.pass .kpi-value {
+            color: var(--pass);
+        }
+
+        .kpi-card.fail .kpi-value {
+            color: var(--fail);
+        }
+
+        .kpi-card.skip .kpi-value {
+            color: var(--skip);
+        }
+
+        .kpi-card.total .kpi-value {
+            color: var(--accent2);
+        }
+
+        .kpi-card.new-tests .kpi-value {
+            color: var(--new);
+        }
+
+        .kpi-card.runs .kpi-value {
+            color: var(--accent4);
+        }
+
+        .kpi-card.duration .kpi-value {
+            color: var(--timeout);
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .kpi-delta {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            margin-top: 8px;
+            color: var(--text-dim);
+        }
+
+        .kpi-delta.up {
+            color: var(--pass);
+        }
+
+        .kpi-delta.down {
+            color: var(--fail);
+        }
+
+        /* ── CHART GRID ── */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .charts-grid .wide {
+            grid-column: 1 / -1;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px;
+        }
+
+        .chart-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .chart-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 260px;
+        }
+
+        .chart-wrap.tall {
+            height: 320px;
+        }
+
+        /* ── TREND STATS ROW ── */
+        .trend-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 48px;
+        }
+
+        .trend-cell {
+            background: var(--surface);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .trend-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .trend-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ── TABLE ── */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 48px;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .table-header p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 12px 24px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        tbody td {
+            padding: 14px 24px;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .status-pill {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .pill-pass {
+            background: rgba(79, 255, 176, 0.1);
+            color: var(--pass);
+            border: 1px solid rgba(79, 255, 176, 0.2);
+        }
+
+        .pill-fail {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--fail);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .pill-skip {
+            background: rgba(255, 209, 102, 0.1);
+            color: var(--skip);
+            border: 1px solid rgba(255, 209, 102, 0.2);
+        }
+
+        .pill-new {
+            background: rgba(123, 111, 255, 0.1);
+            color: var(--new);
+            border: 1px solid rgba(123, 111, 255, 0.2);
+        }
+
+        .mono {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ── INSIGHT CARDS ── */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .insight-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .insight-card h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ── FOOTER ── */
+        .report-footer {
+            border-top: 1px solid var(--border);
+            padding: 28px 48px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .footer-brand {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer-brand strong {
+            color: var(--text);
+        }
+
+        .footer-designer {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .footer-designer span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .footer-mono {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-align: right;
+        }
+
+        /* scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        @media (max-width: 900px) {
+
+            .main,
+            .report-header {
+                padding: 24px;
+            }
+
+            .report-footer {
+                padding: 24px;
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .footer-designer,
+            .footer-mono {
+                text-align: left;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid .wide {
+                grid-column: 1;
+            }
+
+            .trend-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .header-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-meta {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
+<header class="report-header">
+    <div class="header-grid">
+        <div>
+            <div class="report-badge">Monthly QA Report</div>
+            <h1 class="report-title">Test Suite<br><span id="report-month-title">February 2025</span></h1>
+            <p class="report-subtitle">
+                A comprehensive overview of automated tests execution across all runs during the reporting period.
+                Tracking pass rates, failure patterns, tests growth, and suite health trends.
+            </p>
+        </div>
+        <div class="header-meta">
+            <div class="meta-chip">Period: <strong id="meta-period">—</strong></div>
+            <div class="meta-chip">Environment: <strong id="meta-env">—</strong></div>
+            <div class="meta-chip">Branch: <strong id="meta-branch">—</strong></div>
+            <div class="meta-chip">Generated: <strong id="meta-generated">—</strong></div>
+            <div class="meta-chip tester-chip">Tester: <strong>Phillimon Motsinoni</strong></div>
+        </div>
+    </div>
+    <div class="header-divider">
+        <span class="health-bar-label">Suite Health</span>
+        <div class="health-bar-track">
+            <div class="health-bar-fill" id="health-bar" style="width:0%"></div>
+        </div>
+        <span class="health-pct" id="health-pct">—%</span>
+    </div>
+</header>
+
+<!-- ═══════════════════════════════ MAIN ═══════════════════════════════ -->
+<main class="main">
+
+    <!-- KPIs -->
+    <div class="section-label">Summary</div>
+    <div class="kpi-grid">
+        <div class="kpi-card total">
+            <div class="kpi-icon">🧪</div>
+            <div class="kpi-value" id="kpi-total">0</div>
+            <div class="kpi-label">Total Executions</div>
+            <div class="kpi-delta" id="kpi-total-d">—</div>
+        </div>
+        <div class="kpi-card pass">
+            <div class="kpi-icon">✅</div>
+            <div class="kpi-value" id="kpi-pass">0</div>
+            <div class="kpi-label">Passed</div>
+            <div class="kpi-delta" id="kpi-pass-d">—</div>
+        </div>
+        <div class="kpi-card fail">
+            <div class="kpi-icon">❌</div>
+            <div class="kpi-value" id="kpi-fail">0</div>
+            <div class="kpi-label">Failed</div>
+            <div class="kpi-delta" id="kpi-fail-d">—</div>
+        </div>
+        <div class="kpi-card skip">
+            <div class="kpi-icon">⏭</div>
+            <div class="kpi-value" id="kpi-skip">0</div>
+            <div class="kpi-label">Skipped</div>
+            <div class="kpi-delta" id="kpi-skip-d">—</div>
+        </div>
+        <div class="kpi-card runs">
+            <div class="kpi-icon">🔄</div>
+            <div class="kpi-value" id="kpi-runs">0</div>
+            <div class="kpi-label">Total Runs</div>
+            <div class="kpi-delta" id="kpi-runs-d">—</div>
+        </div>
+        <div class="kpi-card new-tests">
+            <div class="kpi-icon">✨</div>
+            <div class="kpi-value" id="kpi-new">0</div>
+            <div class="kpi-label">New Tests Added</div>
+            <div class="kpi-delta" id="kpi-new-d">—</div>
+        </div>
+        <div class="kpi-card duration">
+            <div class="kpi-icon">⏱</div>
+            <div class="kpi-value" id="kpi-dur">0m</div>
+            <div class="kpi-label">Total Duration</div>
+            <div class="kpi-delta" id="kpi-dur-d">avg per run</div>
+        </div>
+    </div>
+
+    <!-- TREND ROW -->
+    <div class="section-label">Performance Indicators</div>
+    <div class="trend-row">
+        <div class="trend-cell">
+            <div class="trend-value" id="trend-passrate" style="color:var(--pass)">—%</div>
+            <div class="trend-label">Pass Rate</div>
+        </div>
+        <div class="trend-cell">
+            <div class="trend-value" id="trend-failrate" style="color:var(--fail)">—%</div>
+            <div class="trend-label">Fail Rate</div>
+        </div>
+        <div class="trend-cell">
+            <div class="trend-value" id="trend-flaky" style="color:var(--skip)">—</div>
+            <div class="trend-label">Flaky Tests</div>
+        </div>
+        <div class="trend-cell">
+            <div class="trend-value" id="trend-avgdur" style="color:var(--accent2)">—s</div>
+            <div class="trend-label">Avg Test Duration</div>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="section-label">Visual Analytics</div>
+    <div class="charts-grid">
+
+        <div class="chart-card wide">
+            <div class="chart-title">Daily Run Activity</div>
+            <div class="chart-desc">Number of tests suite executions per day across the month</div>
+            <div class="chart-wrap tall"><canvas id="chartDailyRuns"></canvas></div>
+        </div>
+
+        <div class="chart-card wide">
+            <div class="chart-title">Results Trend Over Time</div>
+            <div class="chart-desc">Cumulative pass, fail, and skip counts per run chronologically</div>
+            <div class="chart-wrap tall"><canvas id="chartTrend"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title">Outcome Distribution</div>
+            <div class="chart-desc">Overall breakdown of tests results for the month</div>
+            <div class="chart-wrap"><canvas id="chartPie"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title">New Tests Added Per Run</div>
+            <div class="chart-desc">Test suite growth — how many new tests cases were introduced</div>
+            <div class="chart-wrap"><canvas id="chartNewTests"></canvas></div>
+        </div>
+
+        <div class="chart-card wide">
+            <div class="chart-title">Pass Rate Per Run</div>
+            <div class="chart-desc">Percentage of tests passing across each run — track stability</div>
+            <div class="chart-wrap"><canvas id="chartPassRate"></canvas></div>
+        </div>
+
+        <div class="chart-card wide">
+            <div class="chart-title">Run Duration Over Time</div>
+            <div class="chart-desc">How long each run took — spikes may indicate new heavy tests or infra issues
+            </div>
+            <div class="chart-wrap"><canvas id="chartDuration"></canvas></div>
+        </div>
+
+    </div>
+
+    <!-- RUN TABLE -->
+    <div class="section-label">Run Log</div>
+    <div class="table-card">
+        <div class="table-header">
+            <div>
+                <h3>All Runs This Month</h3>
+                <p>Each row represents a complete tests suite execution</p>
+            </div>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Run ID</th>
+                <th>Branch</th>
+                <th>Environment</th>
+                <th>Total</th>
+                <th>Passed</th>
+                <th>Failed</th>
+                <th>Skipped</th>
+                <th>New</th>
+                <th>Pass Rate</th>
+                <th>Duration</th>
+            </tr>
+            </thead>
+            <tbody id="runs-table-body">
+            <!-- populated by JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="section-label">Insights</div>
+    <div class="insights-grid" id="insights-grid">
+        <!-- populated by JS -->
+    </div>
+
+</main>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer class="report-footer">
+    <div class="footer-brand"><strong>QA Monthly Report</strong> · Playwright + TypeScript</div>
+    <div class="footer-designer">Designed &amp; maintained by <span>Phillimon Motsinoni</span></div>
+    <div class="footer-mono" id="footer-stamp">—</div>
+</footer>
+
+<script>
+    // ─────────────────────────────────────────────────────────────────────────────
+    // DEMO / SAMPLE DATA — replaced by window.__REPORT_DATA__ injection in production
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Generates sample data for the report.
+     * Sample data includes the previous month's runs, with random run counts, tests counts, and pass rates.
+     * @returns {Object} - An object containing the previous month and an array of run objects.
+     * @example
+     * const { month, runs } = generateSampleData();
+     * console.log(month); // '2025-02'
+     * console.log(runs); // array of run objects
+     */
+    function generateSampleData() {
+        const now = new Date();
+        const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const month = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+        const year = prevDate.getFullYear();
+        const monthNum = prevDate.getMonth(); // 0-indexed, already decremented
+        const daysInMonth = new Date(year, monthNum + 1, 0).getDate();
+        const runs = [];
+
+        for (let day = 1; day <= daysInMonth; day += Math.floor(Math.random() * 3) + 1) {
+            const date = `${month}-${String(day).padStart(2, '0')}`;
+            const runCount = Math.floor(Math.random() * 3) + 1;
+            for (let r = 0; r < runCount; r++) {
+                const newTests = Math.floor(Math.random() * 5);
+                const total = 80 + Math.floor(Math.random() * 40);
+                const failed = Math.floor(Math.random() * 8);
+                const skipped = Math.floor(Math.random() * 5);
+                const passed = total - failed - skipped;
+                const branch = ['main', 'develop'][Math.floor(Math.random() * 2)];
+                runs.push({
+                    runId: Math.random().toString(36).slice(2, 9),
+                    timestamp: `${date}T${String(8 + r * 4).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}:00Z`,
+                    date, month, branch,
+                    commitSha: Math.random().toString(16).slice(2, 9),
+                    environment: branch === 'main' ? 'qa' : 'develop',
+                    totalTests: total, passed, failed, skipped,
+                    timedOut: Math.floor(Math.random() * 2),
+                    duration: 60000 + Math.floor(Math.random() * 180000),
+                    newTests, tests: []
+                });
+            }
+        }
+        return { month, runs };
+    }
+
+    const DATA = window.__REPORT_DATA__ || generateSampleData();
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────────────────────────────────────────
+    function fmt(n) { return n.toLocaleString(); }
+    function pct(a, b) { return b === 0 ? '0.0' : ((a / b) * 100).toFixed(1); }
+    function ms2min(ms) { return (ms / 60000).toFixed(1) + 'm'; }
+    function ms2sec(ms) { return (ms / 1000).toFixed(1) + 's'; }
+    function monthLabel(ym) {
+        const [y, m] = ym.split('-');
+        return new Date(y, m - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+    }
+
+    Chart.defaults.color = '#6b7080';
+    Chart.defaults.font.family = "'DM Mono', monospace";
+    Chart.defaults.font.size = 11;
+    Chart.defaults.borderColor = '#1f2330';
+
+    function makeChart(id, cfg) {
+        const ctx = document.getElementById(id).getContext('2d');
+        return new Chart(ctx, cfg);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // POPULATE
+    // ─────────────────────────────────────────────────────────────────────────────
+    (function populate() {
+        const { month, runs } = DATA;
+        const sorted = [...runs].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+
+        const totals = sorted.reduce((acc, r) => ({
+            total: acc.total + r.totalTests,
+            passed: acc.passed + r.passed,
+            failed: acc.failed + r.failed,
+            skipped: acc.skipped + r.skipped,
+            timedOut: acc.timedOut + (r.timedOut || 0),
+            newTests: acc.newTests + (r.newTests || 0),
+            duration: acc.duration + r.duration,
+        }), { total: 0, passed: 0, failed: 0, skipped: 0, timedOut: 0, newTests: 0, duration: 0 });
+
+        const passRate = +pct(totals.passed, totals.total);
+        const failRate = +pct(totals.failed, totals.total);
+
+        // ── Header chips
+        document.getElementById('report-month-title').textContent = monthLabel(month);
+        document.getElementById('meta-period').textContent = monthLabel(month);
+        document.getElementById('meta-generated').textContent = new Date().toLocaleDateString();
+
+        const envMap = { ci: 'qa', staging: 'develop' };
+        const envs = [...new Set(sorted.map(r => envMap[r.environment] ?? r.environment))]
+            .filter(e => ['qa', 'develop'].includes(e));
+        document.getElementById('meta-env').textContent = envs.join(', ') || 'qa';
+
+        const branches = [...new Set(sorted.map(r => r.branch).filter(Boolean))]
+            .filter(b => ['main', 'qa', 'develop'].includes(b));
+        document.getElementById('meta-branch').textContent = branches.join(', ') || 'main';
+
+        document.getElementById('health-bar').style.width = passRate + '%';
+        document.getElementById('health-pct').textContent = passRate + '%';
+
+        // ── KPIs
+        document.getElementById('kpi-total').textContent = fmt(totals.total);
+        document.getElementById('kpi-pass').textContent = fmt(totals.passed);
+        document.getElementById('kpi-fail').textContent = fmt(totals.failed);
+        document.getElementById('kpi-skip').textContent = fmt(totals.skipped);
+        document.getElementById('kpi-runs').textContent = fmt(sorted.length);
+        document.getElementById('kpi-new').textContent = fmt(totals.newTests);
+        document.getElementById('kpi-dur').textContent = ms2min(totals.duration);
+        document.getElementById('kpi-dur-d').textContent = 'avg ' + ms2min(totals.duration / (sorted.length || 1)) + '/run';
+
+        // ── Trend indicators
+        document.getElementById('trend-passrate').textContent = passRate + '%';
+        document.getElementById('trend-failrate').textContent = failRate + '%';
+        const flakyRuns = sorted.filter(r => r.failed > 0 && r.passed > 0).length;
+        document.getElementById('trend-flaky').textContent = flakyRuns + ' runs';
+        const avgDur = totals.total > 0 ? totals.duration / totals.total : 0;
+        document.getElementById('trend-avgdur').textContent = ms2sec(avgDur);
+
+        // ── Charts
+        const dayMap = {};
+        for (const r of sorted) { dayMap[r.date] = (dayMap[r.date] || 0) + 1; }
+        const dayLabels = Object.keys(dayMap).sort();
+        const dayValues = dayLabels.map(d => dayMap[d]);
+        const runLabels = sorted.map((_, i) => `Run ${i + 1}`);
+
+        // 1. Daily runs
+        makeChart('chartDailyRuns', {
+            type: 'bar',
+            data: { labels: dayLabels.map(d => d.slice(5)), datasets: [{ label: 'Runs', data: dayValues, backgroundColor: 'rgba(255,209,102,0.2)', borderColor: '#ffd166', borderWidth: 2, borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080' } }, y: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080', stepSize: 1 } } } }
+        });
+
+        // 2. Trend line
+        makeChart('chartTrend', {
+            type: 'line',
+            data: {
+                labels: runLabels, datasets: [
+                    { label: 'Passed', data: sorted.map(r => r.passed), borderColor: '#4fffb0', backgroundColor: 'rgba(79,255,176,0.05)', tension: 0.4, pointRadius: 3, fill: true },
+                    { label: 'Failed', data: sorted.map(r => r.failed), borderColor: '#ff6b6b', backgroundColor: 'rgba(255,107,107,0.05)', tension: 0.4, pointRadius: 3, fill: true },
+                    { label: 'Skipped', data: sorted.map(r => r.skipped), borderColor: '#ffd166', backgroundColor: 'rgba(255,209,102,0.05)', tension: 0.4, pointRadius: 3, fill: true },
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080', maxTicksLimit: 10 } }, y: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080' } } } }
+        });
+
+        // 3. Doughnut
+        makeChart('chartPie', {
+            type: 'doughnut',
+            data: { labels: ['Passed', 'Failed', 'Skipped', 'Timed Out'], datasets: [{ data: [totals.passed, totals.failed, totals.skipped, totals.timedOut], backgroundColor: ['rgba(79,255,176,0.8)', 'rgba(255,107,107,0.8)', 'rgba(255,209,102,0.8)', 'rgba(255,159,67,0.8)'], borderColor: '#111318', borderWidth: 3, hoverOffset: 8 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { padding: 16, usePointStyle: true } } } }
+        });
+
+        // 4. New tests per run
+        makeChart('chartNewTests', {
+            type: 'bar',
+            data: { labels: runLabels, datasets: [{ label: 'New Tests', data: sorted.map(r => r.newTests || 0), backgroundColor: 'rgba(123,111,255,0.3)', borderColor: '#7b6fff', borderWidth: 2, borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080', maxTicksLimit: 12 } }, y: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080', stepSize: 1 } } } }
+        });
+
+        // 5. Pass rate per run
+        makeChart('chartPassRate', {
+            type: 'line',
+            data: { labels: runLabels, datasets: [{ label: 'Pass Rate %', data: sorted.map(r => +pct(r.passed, r.totalTests)), borderColor: '#4fffb0', backgroundColor: 'rgba(79,255,176,0.05)', tension: 0.4, pointRadius: 4, pointHoverRadius: 6, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080', maxTicksLimit: 12 } }, y: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080', callback: v => v + '%' }, min: 0, max: 100 } } }
+        });
+
+        // 6. Duration per run
+        makeChart('chartDuration', {
+            type: 'bar',
+            data: { labels: runLabels, datasets: [{ label: 'Duration (min)', data: sorted.map(r => +(r.duration / 60000).toFixed(2)), backgroundColor: 'rgba(255,159,67,0.2)', borderColor: '#ff9f43', borderWidth: 2, borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080', maxTicksLimit: 12 } }, y: { grid: { color: '#1f2330' }, ticks: { color: '#6b7080', callback: v => v + 'm' } } } }
+        });
+
+        // ── Run table
+        const tbody = document.getElementById('runs-table-body');
+        sorted.forEach((r, i) => {
+            const rate = pct(r.passed, r.totalTests);
+            const rateColor = rate >= 90 ? 'var(--pass)' : rate >= 70 ? 'var(--skip)' : 'var(--fail)';
+            const envMap2 = { ci: 'qa', staging: 'develop' };
+            const displayEnv = envMap2[r.environment] ?? r.environment;
+            tbody.innerHTML += `
+            <tr>
+                <td class="mono">${i + 1}</td>
+                <td>${r.date}</td>
+                <td class="mono">${r.runId}</td>
+                <td class="mono" style="color:var(--accent2)">${r.branch || '—'}</td>
+                <td><span class="status-pill pill-skip">${displayEnv}</span></td>
+                <td>${fmt(r.totalTests)}</td>
+                <td style="color:var(--pass)">${fmt(r.passed)}</td>
+                <td style="color:var(--fail)">${fmt(r.failed)}</td>
+                <td style="color:var(--skip)">${fmt(r.skipped)}</td>
+                <td>${r.newTests > 0 ? `<span class="status-pill pill-new">+${r.newTests}</span>` : '—'}</td>
+                <td style="color:${rateColor};font-weight:600">${rate}%</td>
+                <td class="mono">${ms2min(r.duration)}</td>
+            </tr>`;
+        });
+
+        // ── Insights
+        const worstRun = [...sorted].sort((a, b) => b.failed - a.failed)[0];
+        const bestRun = [...sorted].sort((a, b) => (b.passed / b.totalTests) - (a.passed / a.totalTests))[0];
+        const avgPassRate = (sorted.reduce((s, r) => s + r.passed / r.totalTests, 0) / sorted.length * 100).toFixed(1);
+
+        document.getElementById('insights-grid').innerHTML = [
+            { icon: '🏆', title: 'Best Run', text: `Run on ${bestRun?.date} achieved ${pct(bestRun?.passed, bestRun?.totalTests)}% pass rate — highest of the month.` },
+            { icon: '⚠️', title: 'Most Failures', text: `Run on ${worstRun?.date} had ${worstRun?.failed} failures — investigate if this correlates with a deployment.` },
+            { icon: '📈', title: 'Test Growth', text: `${totals.newTests} new tests were added this month across ${sorted.length} runs, expanding coverage.` },
+            { icon: '📊', title: 'Average Pass Rate', text: `The month averaged ${avgPassRate}% passing tests across all runs. ${+avgPassRate >= 90 ? 'Suite is healthy ✅' : +avgPassRate >= 75 ? 'Moderate stability — track failures 🔍' : 'Stability needs attention ❗'}` },
+            { icon: '⏱', title: 'Execution Time', text: `Total execution time: ${ms2min(totals.duration)}. Average per run: ${ms2min(totals.duration / (sorted.length || 1))}.` },
+            { icon: '🔁', title: 'Run Frequency', text: `${sorted.length} runs in ${dayLabels.length} active days — avg ${(sorted.length / dayLabels.length).toFixed(1)} runs/day.` },
+        ].map(ins => `<div class="insight-card"><h4>${ins.icon} ${ins.title}</h4><p>${ins.text}</p></div>`).join('');
+
+        // ── Footer stamp
+        document.getElementById('footer-stamp').textContent =
+            `Generated ${new Date().toISOString()} · ${sorted.length} runs · ${fmt(totals.total)} executions`;
+
+    })();
+</script>
+</body>
+
+</html>

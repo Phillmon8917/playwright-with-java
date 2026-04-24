@@ -1,30 +1,36 @@
 package utils.credentials;
 
-public class CredentialsProvider
-{
+import utils.env.EnvUtil;
+
+public class CredentialsProvider {
+
+
     /**
-     * Retrieves credentials based on the key.
+     * Returns the credentials associated with the supplied role option.
+     *
+     * @param key the credential option that identifies which credentials to load
+     * @return the resolved credentials for the requested role
      */
     public static Credentials getCredentials(CredentialsOptions key) {
 
         switch (key) {
             case ADMIN:
                 return new Credentials(
-                        System.getenv().getOrDefault("ADMIN_USERNAME", ""),
-                        System.getenv().getOrDefault("ADMIN_PASSWORD", "")
+                        EnvUtil.get("ADMIN_USERNAME"),
+                        EnvUtil.get("ADMIN_PASSWORD")
                 );
 
             case AGENT:
                 return new Credentials(
-                        System.getenv().getOrDefault("AGENT_USERNAME", ""),
-                        System.getenv().getOrDefault("AGENT_PASSWORD", "")
+                        EnvUtil.get("AGENT_USERNAME"),
+                        EnvUtil.get("AGENT_PASSWORD")
                 );
 
             case CUSTOMER:
             default:
                 return new Credentials(
-                        System.getenv().getOrDefault("CUSTOMER_USERNAME", ""),
-                        System.getenv().getOrDefault("CUSTOMER_PASSWORD", "")
+                        EnvUtil.get("CUSTOMER_USERNAME"),
+                        EnvUtil.get("CUSTOMER_PASSWORD")
                 );
         }
     }

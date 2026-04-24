@@ -10,10 +10,20 @@ public class Credentials
         this.password = password;
     }
 
+    /**
+     * Returns the configured username.
+     *
+     * @return the username value
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Returns the configured password.
+     *
+     * @return the password value
+     */
     public String getPassword() {
         return password;
     }

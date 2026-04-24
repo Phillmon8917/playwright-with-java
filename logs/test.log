@@ -1,0 +1,29 @@
+[2026-04-24 17:44:37] [INFO] [reporter] Known test IDs loaded: 45
+[2026-04-24 17:44:37] [INFO] [reporter] Known test IDs loaded: 45
+[2026-04-24 17:44:37] [INFO] [reporter] Known test IDs loaded: 45
+[2026-04-24 17:44:51] [WARN] [ENV] Missing key → CI
+[2026-04-24 17:44:52] [INFO] Starting: verifySuccessfulCustomerSignup()
+[2026-04-24 17:44:52] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-24 17:44:52] [INFO] Starting: verifyFirstNameInputValidation()
+[2026-04-24 17:44:52] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-24 17:44:52] [INFO] Starting: verifyEmailInputValidation()
+[2026-04-24 17:44:52] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-24 17:44:52] [INFO] Starting: verifyLanguageChange()
+[2026-04-24 17:44:52] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-24 17:44:54] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-24 17:45:04] [INFO] Starting: verifySuccessfulAgentSignup()
+[2026-04-24 17:45:04] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-24 17:45:05] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-24 17:45:05] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-24 17:45:05] [INFO] [ENV] Found in .env → TEST_TIMEOUT

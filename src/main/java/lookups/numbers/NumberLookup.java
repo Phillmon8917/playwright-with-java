@@ -1,0 +1,56 @@
+package lookups.numbers;
+
+import java.util.Map;
+
+public class NumberLookup {
+
+    public static final Map<String, Integer> NUMBERS = Map.ofEntries(
+            Map.entry("zero", 0), Map.entry("one", 1), Map.entry("two", 2),
+            Map.entry("three", 3), Map.entry("four", 4), Map.entry("five", 5),
+            Map.entry("six", 6), Map.entry("seven", 7), Map.entry("eight", 8),
+            Map.entry("nine", 9), Map.entry("ten", 10), Map.entry("eleven", 11),
+            Map.entry("twelve", 12), Map.entry("thirteen", 13), Map.entry("fourteen", 14),
+            Map.entry("fifteen", 15), Map.entry("sixteen", 16), Map.entry("seventeen", 17),
+            Map.entry("eighteen", 18), Map.entry("nineteen", 19), Map.entry("twenty", 20),
+            Map.entry("twenty-one", 21), Map.entry("twenty-two", 22),
+            Map.entry("twenty-three", 23), Map.entry("twenty-four", 24),
+            Map.entry("twenty-five", 25), Map.entry("twenty-six", 26),
+            Map.entry("twenty-seven", 27), Map.entry("twenty-eight", 28),
+            Map.entry("twenty-nine", 29), Map.entry("thirty", 30),
+            Map.entry("thirty-one", 31), Map.entry("thirty-two", 32),
+            Map.entry("thirty-three", 33), Map.entry("thirty-four", 34),
+            Map.entry("thirty-five", 35), Map.entry("thirty-six", 36),
+            Map.entry("thirty-seven", 37), Map.entry("thirty-eight", 38),
+            Map.entry("thirty-nine", 39), Map.entry("forty", 40),
+            Map.entry("forty-one", 41), Map.entry("forty-two", 42),
+            Map.entry("forty-three", 43), Map.entry("forty-four", 44),
+            Map.entry("forty-five", 45), Map.entry("forty-six", 46),
+            Map.entry("forty-seven", 47), Map.entry("forty-eight", 48),
+            Map.entry("forty-nine", 49), Map.entry("fifty", 50),
+            Map.entry("fifty-one", 51), Map.entry("fifty-two", 52),
+            Map.entry("fifty-three", 53), Map.entry("fifty-four", 54),
+            Map.entry("fifty-five", 55), Map.entry("fifty-six", 56),
+            Map.entry("fifty-seven", 57), Map.entry("fifty-eight", 58),
+            Map.entry("fifty-nine", 59), Map.entry("sixty", 60),
+            Map.entry("sixty-one", 61), Map.entry("sixty-two", 62),
+            Map.entry("sixty-three", 63), Map.entry("sixty-four", 64),
+            Map.entry("sixty-five", 65), Map.entry("sixty-six", 66),
+            Map.entry("sixty-seven", 67), Map.entry("sixty-eight", 68),
+            Map.entry("sixty-nine", 69), Map.entry("seventy", 70),
+            Map.entry("seventy-one", 71), Map.entry("seventy-two", 72),
+            Map.entry("seventy-three", 73), Map.entry("seventy-four", 74),
+            Map.entry("seventy-five", 75), Map.entry("seventy-six", 76),
+            Map.entry("seventy-seven", 77), Map.entry("seventy-eight", 78),
+            Map.entry("seventy-nine", 79), Map.entry("eighty", 80),
+            Map.entry("eighty-one", 81), Map.entry("eighty-two", 82),
+            Map.entry("eighty-three", 83), Map.entry("eighty-four", 84),
+            Map.entry("eighty-five", 85), Map.entry("eighty-six", 86),
+            Map.entry("eighty-seven", 87), Map.entry("eighty-eight", 88),
+            Map.entry("eighty-nine", 89), Map.entry("ninety", 90),
+            Map.entry("ninety-one", 91), Map.entry("ninety-two", 92),
+            Map.entry("ninety-three", 93), Map.entry("ninety-four", 94),
+            Map.entry("ninety-five", 95), Map.entry("ninety-six", 96),
+            Map.entry("ninety-seven", 97), Map.entry("ninety-eight", 98),
+            Map.entry("ninety-nine", 99), Map.entry("one hundred", 100)
+    );
+}
