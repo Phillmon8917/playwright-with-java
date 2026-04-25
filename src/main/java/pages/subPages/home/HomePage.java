@@ -1,6 +1,7 @@
 package pages.subPages.home;
 
 import com.microsoft.playwright.Page;
+
 import utils.logger.LoggingUtil;
 
 public class HomePage extends HomeBasePage {
@@ -266,6 +267,9 @@ public class HomePage extends HomeBasePage {
                 "Login Page",
                 "verifyNavigationToLoginPage"
         );
+
+        this.modulars.browser.waitForPageLoaderToDisappear(page, "verifyNavigationToLoginPage");
+        
         modulars.assertions.assertElementState(signInToYourAccountButton, "visible", "Sign In To Your Account Button", "verifyNavigationToLoginPage");
         LoggingUtil.info("Login Page is opened successfully");
     }
