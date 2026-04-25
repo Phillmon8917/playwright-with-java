@@ -216,6 +216,9 @@ jobs:
       - name: Generate Allure report
         run: mvn allure:report
 
+      - name: Compile project
+        run: mvn compile
+
       - name: Build monthly report
         run: mvn exec:java -Dexec.mainClass=report.BuildReport
 
