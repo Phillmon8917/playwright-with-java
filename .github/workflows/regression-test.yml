@@ -129,6 +129,10 @@ jobs:
         shard: [ 1, 2, 3, 4, 5, 6 ]
     env:
       CI: true
+      DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
+      DATA_REPO_OWNER: Phillmon8917
+      DATA_REPO_NAME: phptravels-reports
+      DATA_REPO_BRANCH: java-reports
       ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       CUSTOMER_USERNAME: ${{ secrets.CUSTOMER_USERNAME }}
@@ -211,6 +215,9 @@ jobs:
 
       - name: Generate Allure report
         run: mvn allure:report
+
+      - name: Compile project
+        run: mvn compile
 
       - name: Build monthly report
         run: mvn exec:java -Dexec.mainClass=report.BuildReport
