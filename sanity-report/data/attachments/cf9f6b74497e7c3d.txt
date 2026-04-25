@@ -1,0 +1,22 @@
+[2026-04-25 14:39:24] [INFO] Starting: verifyConfirmPasswordInputValidation()
+[2026-04-25 14:39:24] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-25 14:39:24] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-25 14:39:24] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-25 14:39:24] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-25 14:39:40] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-25 14:39:42] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-04-25 14:39:44] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-04-25 14:39:44] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-25 14:39:47] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-04-25 14:39:47] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-25 14:39:49] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-04-25 14:39:49] [INFO] Agent Signup Page is opened successfully
+[2026-04-25 14:39:51] [INFO] fillFirstNameInput - Successfully filled First Name with value: Isidro
+[2026-04-25 14:39:52] [INFO] fillLastNameInput - Successfully filled Last Name with value: Jenkins
+[2026-04-25 14:39:52] [INFO] fillEmailInput - Successfully filled Email with value: *************************
+[2026-04-25 14:39:53] [INFO] fillPasswordInput - Successfully filled Password with value: ********
+[2026-04-25 14:39:53] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-04-25 14:39:53] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-04-25 14:39:53] [INFO] getValidationMessage - Native validation message found for field: confirm_password
+[2026-04-25 14:39:53] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-04-25 14:39:53] [INFO] Assertion Passed - Confirm password input validation is successful
