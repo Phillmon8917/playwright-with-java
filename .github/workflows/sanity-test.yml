@@ -63,6 +63,10 @@ jobs:
         inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
       TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout ||
         vars.TEST_TIMEOUT }}
+      DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
+      DATA_REPO_OWNER: Phillmon8917
+      DATA_REPO_NAME: phptravels-reports
+      DATA_REPO_BRANCH: java-reports
 
     steps:
       - name: Checkout repo
