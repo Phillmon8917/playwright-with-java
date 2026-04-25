@@ -1,0 +1,12 @@
+[2026-04-25 14:47:19] [INFO] Starting: verifyNavigationToPrivacyPolicyPage()
+[2026-04-25 14:47:19] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-25 14:47:19] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-25 14:47:19] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-25 14:47:19] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-25 14:47:39] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-25 14:47:41] [INFO] verifyNavigationToPrivacyPolicyPage - Successfully hovered over Company
+[2026-04-25 14:47:42] [INFO] verifyNavigationToPrivacyPolicyPage - Successfully clicked Privacy Policy
+[2026-04-25 14:47:42] [INFO] verifyNavigationToPrivacyPolicyPage - Privacy Policy Page matched with status 200 and method GET
+[2026-04-25 14:47:43] [INFO] verifyNavigationToPrivacyPolicyPage - Privacy Policy Header is visible
+[2026-04-25 14:47:43] [INFO] Privacy Policy Page is opened successfully
+[2026-04-25 14:47:43] [INFO] Assertion Passed - Navigation to privacy policy page is successful
