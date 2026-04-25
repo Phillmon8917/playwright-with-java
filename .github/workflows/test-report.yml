@@ -27,19 +27,19 @@ on:
       base_url:
         description: "Base URL"
         required: false
-        default: ""
+        default: "https://phptravels.net/"
       action_timeout:
         description: "Action timeout (ms)"
         required: false
-        default: ""
+        default: "80000"
       navigation_timeout:
         description: "Navigation timeout (ms)"
         required: false
-        default: ""
+        default: "120000"
       test_timeout:
         description: "Test timeout (ms)"
         required: false
-        default: ""
+        default: "80000"
 
 jobs:
   authenticate:
@@ -54,9 +54,12 @@ jobs:
       AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
       DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
       BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
-      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
-      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
-      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout ||
+        vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' &&
+        inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout ||
+        vars.TEST_TIMEOUT }}
 
     steps:
       - name: Checkout repo
@@ -70,7 +73,8 @@ jobs:
           cache: maven
 
       - name: Install Playwright browsers
-        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI
+          -Dexec.args="install --with-deps"
 
       - name: Run authentication
         run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="authentication"
@@ -88,7 +92,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6]
+        shard: [ 1, 2, 3, 4, 5, 6 ]
     env:
       CI: true
       ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
@@ -98,9 +102,12 @@ jobs:
       AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
       AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
       BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
-      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
-      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
-      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout ||
+        vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' &&
+        inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout ||
+        vars.TEST_TIMEOUT }}
 
     steps:
       - name: Checkout repo
@@ -114,7 +121,8 @@ jobs:
           cache: maven
 
       - name: Install Playwright browsers
-        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI
+          -Dexec.args="install --with-deps"
 
       - name: Download storage state
         uses: actions/download-artifact@v4
@@ -123,7 +131,8 @@ jobs:
           path: storage/
 
       - name: Run shard ${{ matrix.shard }}
-        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="${{ inputs.tag != '' && inputs.tag || 'regression' }} & shard${{ matrix.shard }}"
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="${{ inputs.tag
+          != '' && inputs.tag || 'regression' }} & shard${{ matrix.shard }}"
 
       - name: Upload Allure results
         if: always()
