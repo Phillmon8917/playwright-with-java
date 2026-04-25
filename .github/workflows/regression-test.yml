@@ -8,7 +8,8 @@ permissions:
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 6 * * *" # runs on develop
+    - cron: "0 7 * * *" # runs on qa
   workflow_dispatch:
     inputs:
       tag:
@@ -24,25 +25,57 @@ on:
           - customer
           - agent
           - admin
+      branch:
+        description: "Branch to run on"
+        required: false
+        default: "develop"
+        type: choice
+        options:
+          - develop
+          - qa
       base_url:
         description: "Base URL"
         required: false
-        default: ""
+        default: "https://phptravels.net/"
       action_timeout:
         description: "Action timeout (ms)"
         required: false
-        default: ""
+        default: "80000"
       navigation_timeout:
         description: "Navigation timeout (ms)"
         required: false
-        default: ""
+        default: "120000"
       test_timeout:
         description: "Test timeout (ms)"
         required: false
-        default: ""
+        default: "360000"
 
 jobs:
+  # Resolves which branch to run on.
+  # - Manual: uses the selected branch input
+  # - Scheduled 06:00 UTC → develop
+  # - Scheduled 07:00 UTC → qa
+  resolve-branch:
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.set.outputs.branch }}
+    steps:
+      - name: Resolve target branch
+        id: set
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "branch=${{ inputs.branch }}" >> $GITHUB_OUTPUT
+          else
+            HOUR=$(date -u +%H)
+            if [ "$HOUR" = "06" ]; then
+              echo "branch=develop" >> $GITHUB_OUTPUT
+            else
+              echo "branch=qa" >> $GITHUB_OUTPUT
+            fi
+          fi
+
   authenticate:
+    needs: resolve-branch
     runs-on: ubuntu-latest
     env:
       CI: true
@@ -63,6 +96,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-branch.outputs.branch }}
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -86,7 +121,7 @@ jobs:
           retention-days: 1
 
   test-shard:
-    needs: authenticate
+    needs: [ resolve-branch, authenticate ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -111,6 +146,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-branch.outputs.branch }}
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -142,7 +179,7 @@ jobs:
           retention-days: 1
 
   build-report:
-    needs: test-shard
+    needs: [ resolve-branch, test-shard ]
     runs-on: ubuntu-latest
     if: always()
     env:
@@ -155,6 +192,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-branch.outputs.branch }}
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -179,28 +218,21 @@ jobs:
       - name: Set report date
         run: echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_ENV
 
-      # Checkout the existing gh-pages branch so we can patch only our subfolder
-      # without wiping out whatever sanity last deployed.
       - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
-        continue-on-error: true # branch may not exist yet on the very first run
+        continue-on-error: true
 
       - name: Assemble Pages directory
         run: |
-          # Ensure target folders exist (gh-pages checkout may be missing them)
           mkdir -p gh-pages/monthly-report
           mkdir -p gh-pages/regression-report
 
-          # Monthly report
           cp src/dist/report.html gh-pages/monthly-report/index.html
-
-          # Regression Allure report
           cp -r target/site/allure-maven-plugin/. gh-pages/regression-report/
 
-          # Root landing page — always regenerated so the "last updated" stamp is fresh
           cat > gh-pages/index.html << 'HTML'
           <!DOCTYPE html>
           <html lang="en">
@@ -289,4 +321,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: gh-pages/
-          keep_files: true # keeps sanity-report/ that the other workflow deployed
+          keep_files: true
