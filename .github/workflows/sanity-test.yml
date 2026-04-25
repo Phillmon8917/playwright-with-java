@@ -7,12 +7,14 @@ permissions:
   id-token: write
 
 on:
+  pull_request:
+    branches:
+      - develop
+      - qa
+      - main
   schedule:
     - cron: "0 8 * * *"
     - cron: "0 13 * * *"
-  push:
-    branches:
-      - "**"
   workflow_dispatch:
     inputs:
       tag:
@@ -48,6 +50,11 @@ on:
 jobs:
   sanity:
     runs-on: ubuntu-latest
+    # For scheduled runs, only proceed if we're on develop or qa
+    if: >
+      github.event_name == 'workflow_dispatch' || github.event_name == 'push' ||
+      github.event_name == 'pull_request' || (github.event_name == 'schedule' &&
+      (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa'))
     env:
       CI: true
       ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
@@ -98,28 +105,21 @@ jobs:
         if: always()
         run: echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_ENV
 
-      # Checkout the existing gh-pages branch so we patch only our subfolder
-      # without wiping out what regression last deployed.
       - name: Checkout gh-pages
         if: always()
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
-        continue-on-error: true # branch may not exist yet on the very first run
+        continue-on-error: true
 
       - name: Assemble Pages directory
         if: always()
         run: |
           mkdir -p gh-pages/sanity-report
 
-          # Sanity Allure report
           cp -r target/site/allure-maven-plugin/. gh-pages/sanity-report/
 
-          # Only write index.html if it doesn't already exist
-          # (regression workflow owns the canonical landing page).
-          # We still write it here so the dashboard is available even if
-          # regression has never run yet.
           if [ ! -f gh-pages/index.html ]; then
             cat > gh-pages/index.html << 'HTML'
           <!DOCTYPE html>
@@ -211,7 +211,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: gh-pages/
-          keep_files: true # keeps regression-report/ and monthly-report/ from other workflows
+          keep_files: true
 
       - name: Upload Allure report artifact
         if: always()
