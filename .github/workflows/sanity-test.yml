@@ -7,12 +7,14 @@ permissions:
   id-token: write
 
 on:
+  pull_request:
+    branches:
+      - develop
+      - qa
+      - main
   schedule:
     - cron: "0 8 * * *"
     - cron: "0 13 * * *"
-  push:
-    branches:
-      - "**"
   workflow_dispatch:
     inputs:
       tag:
@@ -48,6 +50,11 @@ on:
 jobs:
   sanity:
     runs-on: ubuntu-latest
+    # For scheduled runs, only proceed if we're on develop or qa
+    if: >
+      github.event_name == 'workflow_dispatch' || github.event_name == 'push' ||
+      github.event_name == 'pull_request' || (github.event_name == 'schedule' &&
+      (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa'))
     env:
       CI: true
       ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
@@ -57,9 +64,16 @@ jobs:
       AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
       AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
       BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
-      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
-      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
-      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout ||
+        vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' &&
+        inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout ||
+        vars.TEST_TIMEOUT }}
+      DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
+      DATA_REPO_OWNER: Phillmon8917
+      DATA_REPO_NAME: phptravels-reports
+      DATA_REPO_BRANCH: java-reports
 
     steps:
       - name: Checkout repo
@@ -73,19 +87,133 @@ jobs:
           cache: maven
 
       - name: Install Playwright browsers
-        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI
+          -Dexec.args="install --with-deps"
 
       - name: Run authentication first
         run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="authentication"
 
       - name: Run sanity tests
-        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="${{ inputs.tag != '' && inputs.tag || 'sanity' }}"
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="${{ inputs.tag
+          != '' && inputs.tag || 'sanity' }}"
 
       - name: Generate Allure report
         if: always()
         run: mvn allure:report
 
-      - name: Upload Allure report
+      - name: Set report date
+        if: always()
+        run: echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_ENV
+
+      - name: Checkout gh-pages
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
+
+      - name: Assemble Pages directory
+        if: always()
+        run: |
+          mkdir -p gh-pages/sanity-report
+
+          cp -r target/site/allure-maven-plugin/. gh-pages/sanity-report/
+
+          if [ ! -f gh-pages/index.html ]; then
+            cat > gh-pages/index.html << 'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <title>Java QA Dashboard</title>
+            <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+            <style>
+              :root { --bg:#0b0d12; --surface:#111318; --border:#1f2330; --accent:#4fffb0; --accent2:#7c9eff; --accent3:#ffb84f; --text:#e8eaf0; --muted:#6b7080; }
+              * { box-sizing:border-box; margin:0; padding:0; }
+              body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif;
+                     min-height:100vh; display:flex; flex-direction:column;
+                     align-items:center; justify-content:center; padding:48px 24px; }
+              .badge { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.2em;
+                       text-transform:uppercase; color:var(--accent);
+                       background:rgba(79,255,176,.08); border:1px solid rgba(79,255,176,.2);
+                       padding:4px 14px; border-radius:2px; margin-bottom:24px; }
+              h1 { font-family:'Syne',sans-serif; font-size:clamp(32px,6vw,56px);
+                   font-weight:800; letter-spacing:-.03em; text-align:center; margin-bottom:12px; }
+              h1 span { color:var(--accent); }
+              .sub { color:var(--muted); font-size:15px; text-align:center; margin-bottom:56px; }
+              .section-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.15em;
+                               text-transform:uppercase; color:var(--muted); margin-bottom:20px;
+                               text-align:center; }
+              .cards { display:flex; gap:24px; flex-wrap:wrap; justify-content:center; margin-bottom:48px; }
+              .card { background:var(--surface); border:1px solid var(--border); border-radius:12px;
+                      padding:32px 28px; text-decoration:none; color:inherit; width:300px;
+                      transition:transform .2s,border-color .2s; position:relative; overflow:hidden; }
+              .card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+              .card.green::before  { background:var(--accent); }
+              .card.blue::before   { background:var(--accent2); }
+              .card.orange::before { background:var(--accent3); }
+              .card:hover { transform:translateY(-4px); border-color:#3a3f50; }
+              .card-icon { font-size:32px; margin-bottom:16px; }
+              .card-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-bottom:8px; }
+              .card-desc { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:24px; }
+              .card-link { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+              .card.green  .card-link { color:var(--accent); }
+              .card.blue   .card-link { color:var(--accent2); }
+              .card.orange .card-link { color:var(--accent3); }
+              .footer { margin-top:8px; font-family:'DM Mono',monospace; font-size:11px;
+                        color:var(--muted); text-align:center; line-height:1.8; }
+              .footer span { color:var(--accent); }
+            </style>
+          </head>
+          <body>
+            <div class="badge">QA Automation · Java · PHPTRAVELS</div>
+            <h1>Java Test <span>Dashboard</span></h1>
+            <p class="sub">Sanity, regression and monthly QA reports for the Java Playwright suite.</p>
+
+            <div class="section-label">Reports</div>
+            <div class="cards">
+
+              <a href="./sanity-report/index.html" class="card blue">
+                <div class="card-icon">⚡</div>
+                <div class="card-title">Sanity Report</div>
+                <div class="card-desc">Latest sanity run — fast smoke-check across core flows, published on every push and twice daily.</div>
+                <div class="card-link">View report →</div>
+              </a>
+
+              <a href="./regression-report/index.html" class="card green">
+                <div class="card-icon">🧪</div>
+                <div class="card-title">Regression Report</div>
+                <div class="card-desc">Full regression Allure report with logs, screenshots, videos and step-level details.</div>
+                <div class="card-link">View report →</div>
+              </a>
+
+              <a href="./monthly-report/index.html" class="card orange">
+                <div class="card-icon">📊</div>
+                <div class="card-title">Monthly QA Report</div>
+                <div class="card-desc">Trends, pass rates and run history aggregated across the full month.</div>
+                <div class="card-link">View report →</div>
+              </a>
+
+            </div>
+
+            <div class="footer">
+              Last updated by sanity workflow: ${{ env.REPORT_DATE }} &nbsp;·&nbsp; Branch: <span>java-reports</span>
+            </div>
+          </body>
+          </html>
+          HTML
+          fi
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: gh-pages/
+          keep_files: true
+
+      - name: Upload Allure report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:

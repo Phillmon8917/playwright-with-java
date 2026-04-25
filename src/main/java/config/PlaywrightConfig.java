@@ -1,11 +1,15 @@
 package config;
 
-import com.microsoft.playwright.*;
-import com.microsoft.playwright.options.RecordVideoSize;
-import utils.env.EnvUtil;
-
 import java.nio.file.Path;
-import java.util.List;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.options.RecordVideoSize;
+
+import utils.env.EnvUtil;
 
 public class PlaywrightConfig {
 
@@ -53,12 +57,11 @@ public class PlaywrightConfig {
     public static Browser launchBrowser(Playwright playwright) {
         return playwright.chromium().launch(
                 new BrowserType.LaunchOptions()
-                        .setHeadless(IS_CI)
-                        .setArgs(List.of("--start-maximized")));
+                        .setHeadless(IS_CI));
     }
 
     /**
-     * Creates a browser context configured with the base URL, viewport behavior, and video recording.
+     * Creates a browser context configured with the base URL, viewport size, and video recording.
      *
      * @param browser the browser used to create the context
      * @param videoDir the directory where recorded videos should be stored
@@ -69,7 +72,7 @@ public class PlaywrightConfig {
 
         return browser.newContext(new Browser.NewContextOptions()
                 .setBaseURL(!baseUrl.isEmpty() ? baseUrl : "https://phptravels.net/")
-                .setViewportSize(null)
+                .setViewportSize(1920, 1080)
                 .setRecordVideoDir(videoDir)
                 .setRecordVideoSize(new RecordVideoSize(1280, 720)));
     }
@@ -87,7 +90,7 @@ public class PlaywrightConfig {
 
         return browser.newContext(new Browser.NewContextOptions()
                 .setBaseURL(!baseUrl.isEmpty() ? baseUrl : "https://phptravels.net/")
-                .setViewportSize(null)
+                .setViewportSize(1920, 1080)
                 .setStorageStatePath(storagePath)
                 .setRecordVideoDir(videoDir)
                 .setRecordVideoSize(new RecordVideoSize(1280, 720)));

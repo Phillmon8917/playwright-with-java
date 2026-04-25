@@ -3,6 +3,7 @@ package pages.subPages.login;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+
 import pages.basePage.BasePage;
 
 public class LoginBasePage extends BasePage {
@@ -21,7 +22,7 @@ public class LoginBasePage extends BasePage {
         this.emailInput = page.locator("input[placeholder='Email Address']");
         this.passwordInput = page.locator("input[placeholder='Password']");
         this.rememberMeCheckbox = page.locator("div.checkbox-custom span");
-        this.loginButton = page.locator("button[type='submit']");
+        this.loginButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Login"));
         this.dashBoardHeader = page.locator("div h1:text('Dashboard')");
         this.loggedInUserButton = page.locator("button span:has-text('account_circle')");
         this.logoutButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Logout"));

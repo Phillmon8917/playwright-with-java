@@ -1,6 +1,7 @@
 package pages.subPages.login;
 
 import com.microsoft.playwright.Page;
+
 import utils.logger.LoggingUtil;
 
 public class LoginPage extends LoginBasePage {
@@ -72,6 +73,8 @@ public class LoginPage extends LoginBasePage {
         fillPasswordInput(password);
         toggleRememberMe(remember);
         clickLoginButton();
+
+        this.modulars.browser.waitForPageLoaderToDisappear(page, "login");
         verifySuccessfulLogin();
 
         LoggingUtil.info("Login successful");
