@@ -1,0 +1,30 @@
+[2026-04-25 13:06:06] [INFO] Starting: verifySuccessfulAgentSignup()
+[2026-04-25 13:06:06] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-25 13:06:06] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-25 13:06:06] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-25 13:06:06] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-25 13:06:28] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-25 13:06:31] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-04-25 13:06:33] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-04-25 13:06:33] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-25 13:06:38] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-04-25 13:06:38] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-25 13:06:40] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-04-25 13:06:40] [INFO] Agent Signup Page is opened successfully
+[2026-04-25 13:06:41] [INFO] extractSecurityCheckQuestion - Successfully retrieved text from Security Check Question
+[2026-04-25 13:06:41] [INFO] Security check question is: 
+                Security Check: What is 3 + 5? *
+            
+[2026-04-25 13:06:41] [INFO] Security question solved: 3 add 5 = 8
+[2026-04-25 13:06:41] [INFO] Security check answer is: 8
+[2026-04-25 13:06:42] [INFO] fillFirstNameInput - Successfully filled First Name with value: Irene
+[2026-04-25 13:06:44] [INFO] fillLastNameInput - Successfully filled Last Name with value: Schuster
+[2026-04-25 13:06:44] [INFO] fillEmailInput - Successfully filled Email with value: ***********************
+[2026-04-25 13:06:45] [INFO] fillPasswordInput - Successfully filled Password with value: **********
+[2026-04-25 13:06:45] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: **********
+[2026-04-25 13:06:45] [INFO] fillSecurityCheckAnswerInput - Successfully filled Security Check Answer with value: 8
+[2026-04-25 13:06:45] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-04-25 13:06:46] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-04-25 13:06:46] [INFO] fillTheSignUpForm - Create Account matched with status 200 and method GET
+[2026-04-25 13:06:47] [INFO] verifyBackendValidationErrorsAreHidden - Backend Error Message is hidden
+[2026-04-25 13:06:47] [INFO] Assertion Passed - Agent signup is successful
