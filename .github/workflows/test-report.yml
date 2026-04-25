@@ -52,6 +52,7 @@ jobs:
       CUSTOMER_PASSWORD: ${{ secrets.CUSTOMER_PASSWORD }}
       AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
       AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
+      DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
       BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
       ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
       NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
