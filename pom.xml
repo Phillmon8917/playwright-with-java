@@ -90,6 +90,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>${env.CI}</skip>
                             <executable>allure</executable>
                             <arguments>
                                 <argument>serve</argument>

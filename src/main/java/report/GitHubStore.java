@@ -21,18 +21,29 @@ import utils.logger.LoggingUtil;
 
 public class GitHubStore {
 
-    private static final String API    = "https://api.github.com";
-    private static final String OWNER  = env("DATA_REPO_OWNER",  "Phillmon8917");
-    private static final String REPO   = env("DATA_REPO_NAME",   "phptravels-reports");
+    private static final String API = "https://api.github.com";
+    private static final String OWNER = env("DATA_REPO_OWNER", "Phillmon8917");
+    private static final String REPO = env("DATA_REPO_NAME", "phptravels-reports");
     private static final String BRANCH = env("DATA_REPO_BRANCH", "java-reports");
-    private static final String TOKEN  = env("DATA_REPO_TOKEN",  "");
+    private static final String TOKEN = env("DATA_REPO_TOKEN", "");
     private static final String KNOWN_IDS_PATH = "data/known-test-ids.json";
 
-    private static final HttpClient HTTP   = HttpClient.newHttpClient();
+    /**
+     * How many times to retry appendRun on a 409 conflict before giving up.
+     */
+    private static final int MAX_RETRIES = 5;
+
+    /**
+     * Base delay (ms) for exponential back-off between conflict retries.
+     */
+    private static final long RETRY_BASE_DELAY_MS = 500;
+
+    private static final HttpClient HTTP = HttpClient.newHttpClient();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
-     * Returns the environment variable value for the supplied key or a fallback when it is blank.
+     * Returns the environment variable value for the supplied key or a fallback
+     * when it is blank.
      *
      * @param key the environment variable name to read
      * @param fallback the fallback value to use when the variable is missing
@@ -44,18 +55,21 @@ public class GitHubStore {
     }
 
     /**
-     * Builds the GitHub API request headers required for authenticated repository access.
+     * Builds the GitHub API request headers required for authenticated
+     * repository access.
      *
      * @return the request headers used for GitHub API calls
      */
     private static Map<String, String> headers() {
-        if (TOKEN.isBlank()) throw new IllegalStateException(
-                "[github-store] DATA_REPO_TOKEN is not set");
+        if (TOKEN.isBlank()) {
+            throw new IllegalStateException(
+                    "[github-store] DATA_REPO_TOKEN is not set");
+        }
         return Map.of(
-                "Authorization",       "Bearer " + TOKEN,
-                "Accept",              "application/vnd.github+json",
-                "X-GitHub-Api-Version","2022-11-28",
-                "Content-Type",        "application/json"
+                "Authorization", "Bearer " + TOKEN,
+                "Accept", "application/vnd.github+json",
+                "X-GitHub-Api-Version", "2022-11-28",
+                "Content-Type", "application/json"
         );
     }
 
@@ -69,13 +83,16 @@ public class GitHubStore {
         return "data/" + month + ".json";
     }
 
-    public record StoreWithSha(MonthlyStore store, String sha) {}
+    public record StoreWithSha(MonthlyStore store, String sha) {
+
+    }
 
     /**
      * Loads a monthly store and its blob SHA from the GitHub data repository.
      *
      * @param month the month key in {@code yyyy-MM} format
-     * @return the loaded store together with its SHA, or an empty store when no file exists
+     * @return the loaded store together with its SHA, or an empty store when no
+     * file exists
      * @throws Exception if the store cannot be fetched or parsed
      */
     public static StoreWithSha loadStore(String month) throws Exception {
@@ -91,7 +108,7 @@ public class GitHubStore {
         }
         assertOk(res, "fetch " + month + ".json");
 
-        Map<?, ?> json    = MAPPER.readValue(res.body(), Map.class);
+        Map<?, ?> json = MAPPER.readValue(res.body(), Map.class);
         String rawContent = new String(Base64.getMimeDecoder()
                 .decode((String) json.get("content")));
         MonthlyStore store = MAPPER.readValue(rawContent, MonthlyStore.class);
@@ -104,7 +121,8 @@ public class GitHubStore {
      * Saves a monthly store to the GitHub data repository.
      *
      * @param store the monthly store to save
-     * @param sha the current blob SHA when updating an existing file, or {@code null} for a new file
+     * @param sha the current blob SHA when updating an existing file, or
+     * {@code null} for a new file
      * @throws Exception if the store cannot be serialized or uploaded
      */
     public static void saveStore(MonthlyStore store, String sha) throws Exception {
@@ -117,8 +135,10 @@ public class GitHubStore {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("message", "ci: append run to " + store.month() + ".json [skip ci]");
         body.put("content", content);
-        body.put("branch",  BRANCH);
-        if (sha != null) body.put("sha", sha);
+        body.put("branch", BRANCH);
+        if (sha != null) {
+            body.put("sha", sha);
+        }
 
         HttpResponse<String> res = HTTP.send(buildPut(url, MAPPER.writeValueAsString(body)),
                 HttpResponse.BodyHandlers.ofString());
@@ -127,24 +147,67 @@ public class GitHubStore {
     }
 
     /**
-     * Appends a run result to the monthly store stored in the GitHub data repository.
+     * Appends a run result to the monthly store in the GitHub data repository.
+     *
+     * <p>
+     * Uses an optimistic-concurrency retry loop to handle the case where two
+     * parallel CI shards attempt to write at the same time. On a 409 conflict
+     * the method re-fetches the latest file (and its up-to-date SHA), appends
+     * the run again, and retries the PUT, backing off exponentially between
+     * attempts.
      *
      * @param run the run result to append
-     * @throws Exception if the run cannot be persisted
+     * @throws Exception if the run cannot be persisted after all retries are
+     * exhausted
      */
     public static void appendRun(RunResult run) throws Exception {
-        StoreWithSha loaded = loadStore(run.month());
-        List<RunResult> runs = new ArrayList<>(loaded.store().runs());
-        runs.add(run);
-        saveStore(new MonthlyStore(run.month(), runs), loaded.sha());
-        LoggingUtil.info("[github-store] Run " + run.runId() + " appended to " + run.month() + ".json");
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            StoreWithSha loaded = loadStore(run.month());
+
+            // Deduplicate: skip if this runId was already written by a concurrent shard.
+            boolean alreadyPresent = loaded.store().runs().stream()
+                    .anyMatch(r -> r.runId().equals(run.runId()));
+            if (alreadyPresent) {
+                LoggingUtil.info("[github-store] Run " + run.runId()
+                        + " already present in " + run.month() + ".json — skipping duplicate write");
+                return;
+            }
+
+            List<RunResult> runs = new ArrayList<>(loaded.store().runs());
+            runs.add(run);
+            MonthlyStore updated = new MonthlyStore(run.month(), runs);
+
+            try {
+                saveStore(updated, loaded.sha());
+                LoggingUtil.info("[github-store] Run " + run.runId()
+                        + " appended to " + run.month() + ".json (attempt " + attempt + ")");
+                return; // success — exit the retry loop
+
+            } catch (RuntimeException e) {
+                boolean isConflict = e.getMessage() != null
+                        && (e.getMessage().contains("409")
+                        || e.getMessage().contains("conflict"));
+
+                if (!isConflict || attempt == MAX_RETRIES) {
+                    throw e; // non-conflict error, or retries exhausted — propagate
+                }
+
+                long delay = RETRY_BASE_DELAY_MS * (1L << (attempt - 1)); // 500, 1000, 2000, 4000 ms
+                LoggingUtil.info("[github-store] 409 conflict on attempt " + attempt
+                        + " — retrying in " + delay + " ms");
+                Thread.sleep(delay);
+            }
+        }
     }
 
     public record ReportData(String reportMonth, MonthlyStore reportStore,
-                             String currentMonth, MonthlyStore currentStore) {}
+            String currentMonth, MonthlyStore currentStore) {
+
+    }
 
     /**
-     * Loads the previous month and current month report data from the GitHub data repository.
+     * Loads the previous month and current month report data from the GitHub
+     * data repository.
      *
      * @return the report data bundle for report generation
      * @throws Exception if the data cannot be fetched
@@ -162,7 +225,7 @@ public class GitHubStore {
         LoggingUtil.info("[github-store] Loading report data — reportMonth: "
                 + reportMonth + ", currentMonth: " + currentMonth);
 
-        MonthlyStore reportStore  = loadStore(reportMonth).store();
+        MonthlyStore reportStore = loadStore(reportMonth).store();
         MonthlyStore currentStore = loadStore(currentMonth).store();
 
         LoggingUtil.info("[github-store] reportStore runs: " + reportStore.runs().size()
@@ -190,10 +253,10 @@ public class GitHubStore {
         }
         assertOk(res, "fetch known-test-ids.json");
 
-        Map<?, ?> json    = MAPPER.readValue(res.body(), Map.class);
+        Map<?, ?> json = MAPPER.readValue(res.body(), Map.class);
         String rawContent = new String(Base64.getMimeDecoder()
                 .decode((String) json.get("content")));
-        List<String> ids  = MAPPER.readValue(rawContent, List.class);
+        List<String> ids = MAPPER.readValue(rawContent, List.class);
 
         LoggingUtil.info("[github-store] Loaded " + ids.size() + " known test IDs");
         return new HashSet<>(ids);
@@ -224,8 +287,10 @@ public class GitHubStore {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("message", "ci: update known-test-ids.json [skip ci]");
         body.put("content", content);
-        body.put("branch",  BRANCH);
-        if (sha != null) body.put("sha", sha);
+        body.put("branch", BRANCH);
+        if (sha != null) {
+            body.put("sha", sha);
+        }
 
         HttpResponse<String> res = HTTP.send(
                 buildPut(url, MAPPER.writeValueAsString(body)),
@@ -247,7 +312,8 @@ public class GitHubStore {
     }
 
     /**
-     * Builds an authenticated HTTP PUT request for the supplied GitHub API URL and request body.
+     * Builds an authenticated HTTP PUT request for the supplied GitHub API URL
+     * and request body.
      *
      * @param url the target request URL
      * @param body the JSON request body to send
@@ -268,8 +334,9 @@ public class GitHubStore {
      * @param ctx a short description of the operation being validated
      */
     private static void assertOk(HttpResponse<String> res, String ctx) {
-        if (res.statusCode() < 200 || res.statusCode() >= 300)
+        if (res.statusCode() < 200 || res.statusCode() >= 300) {
             throw new RuntimeException("[github-store] Failed to " + ctx
                     + ": " + res.statusCode() + "\n" + res.body());
+        }
     }
 }
