@@ -1,0 +1,10 @@
+[2026-04-25 13:40:20] [INFO] Starting: verifyNavigationToFlightBookingPage()
+[2026-04-25 13:40:20] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-25 13:40:20] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-25 13:40:20] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-25 13:40:20] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-25 13:40:35] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-25 13:40:36] [INFO] verifyNavigationToFlightsBooking - Successfully hovered over Services
+[2026-04-25 13:40:37] [INFO] verifyNavigationToFlightsBooking - Successfully clicked Flights
+[2026-04-25 13:40:38] [INFO] verifyNavigationToFlightsBooking - Flights Page matched with status 200 and method GET
+[2026-04-25 13:40:38] [INFO] Assertion Passed - Navigation to flight booking page is successful

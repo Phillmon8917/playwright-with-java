@@ -1,0 +1,31 @@
+[2026-04-25 13:38:38] [INFO] Starting: verifySuccessfulAgentSignup()
+[2026-04-25 13:38:38] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-25 13:38:38] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-25 13:38:38] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-25 13:38:38] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-25 13:39:06] [INFO] [ENV] Found in .env → CI
+[2026-04-25 13:39:08] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-25 13:39:09] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-04-25 13:39:11] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-04-25 13:39:11] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-25 13:39:16] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-04-25 13:39:16] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-25 13:39:18] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-04-25 13:39:18] [INFO] Agent Signup Page is opened successfully
+[2026-04-25 13:39:19] [INFO] extractSecurityCheckQuestion - Successfully retrieved text from Security Check Question
+[2026-04-25 13:39:19] [INFO] Security check question is: 
+                Security Check: What is 11 - 3? *
+            
+[2026-04-25 13:39:19] [INFO] Security question solved: 11 subtract 3 = 8
+[2026-04-25 13:39:19] [INFO] Security check answer is: 8
+[2026-04-25 13:39:21] [INFO] fillFirstNameInput - Successfully filled First Name with value: Sulema
+[2026-04-25 13:39:22] [INFO] fillLastNameInput - Successfully filled Last Name with value: Ward
+[2026-04-25 13:39:22] [INFO] fillEmailInput - Successfully filled Email with value: ****************************
+[2026-04-25 13:39:22] [INFO] fillPasswordInput - Successfully filled Password with value: *********
+[2026-04-25 13:39:22] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: *********
+[2026-04-25 13:39:22] [INFO] fillSecurityCheckAnswerInput - Successfully filled Security Check Answer with value: 8
+[2026-04-25 13:39:23] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-04-25 13:39:23] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-04-25 13:39:23] [INFO] fillTheSignUpForm - Create Account matched with status 200 and method GET
+[2026-04-25 13:39:25] [INFO] verifyBackendValidationErrorsAreHidden - Backend Error Message is hidden
+[2026-04-25 13:39:25] [INFO] Assertion Passed - Agent signup is successful
