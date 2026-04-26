@@ -1,0 +1,12 @@
+[2026-04-26 16:21:01] [INFO] Starting: verifyNavigationToCustomerSignupPage()
+[2026-04-26 16:21:01] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-26 16:21:01] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-26 16:21:01] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-26 16:21:01] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-26 16:21:22] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-26 16:21:23] [INFO] verifyNavigationToCustomerSignupPage - Successfully hovered over Signup
+[2026-04-26 16:21:24] [INFO] verifyNavigationToCustomerSignupPage - Successfully JS-clicked Customer Signup
+[2026-04-26 16:21:24] [INFO] verifyNavigationToCustomerSignupPage - Customer Signup Page matched with status 200 and method GET
+[2026-04-26 16:21:26] [INFO] verifyNavigationToCustomerSignupPage - Agent Registration Header is hidden
+[2026-04-26 16:21:26] [INFO] Customer Signup Page is opened successfully
+[2026-04-26 16:21:26] [INFO] Assertion Passed - Navigation to customer signup page is successful
