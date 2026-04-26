@@ -214,7 +214,7 @@ jobs:
           path: target/allure-results/
 
       - name: Generate Allure report
-        run: mvn allure:report
+        run: mvn io.qameta.allure:allure-maven:2.12.0:report
 
       - name: Compile project
         run: mvn compile
