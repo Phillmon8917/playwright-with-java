@@ -8,8 +8,8 @@ permissions:
 
 on:
   schedule:
-    - cron: "0 6 * * *" # 06:00 UTC → develop
-    - cron: "0 7 * * *" # 07:00 UTC → qa
+    - cron: "0 6 * * *" # 06:00 UTC -> develop
+    - cron: "0 7 * * *" # 07:00 UTC -> qa
   workflow_dispatch:
     inputs:
       tag:
@@ -53,8 +53,8 @@ on:
 jobs:
   # Resolves which branch to run on.
   # - Manual: uses the selected branch input
-  # - Scheduled 06:00 UTC → develop
-  # - Scheduled 07:00 UTC → qa  (1 hour after develop)
+  # - Scheduled 06:00 UTC -> develop
+  # - Scheduled 07:00 UTC -> qa  (1 hour after develop)
   resolve-branch:
     runs-on: ubuntu-latest
     outputs:
@@ -214,13 +214,15 @@ jobs:
           path: target/allure-results/
 
       - name: Generate Allure report
-        run: mvn -f pom.xml io.qameta.allure:allure-maven:2.12.0:report
+        run: mvn -f "$GITHUB_WORKSPACE/pom.xml"
+          io.qameta.allure:allure-maven:2.12.0:report
 
       - name: Compile project
-        run: mvn compile
+        run: mvn -f "$GITHUB_WORKSPACE/pom.xml" compile
 
       - name: Build monthly report
-        run: mvn exec:java -Dexec.mainClass=report.BuildReport
+        run: mvn -f "$GITHUB_WORKSPACE/pom.xml" exec:java
+          -Dexec.mainClass=report.BuildReport
 
       - name: Set report date
         run: echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_ENV
@@ -237,17 +239,17 @@ jobs:
           mkdir -p gh-pages/monthly-report
           mkdir -p gh-pages/regression-report
 
-          if [ -f "src/dist/report.html" ]; then
-            cp src/dist/report.html gh-pages/monthly-report/index.html
+          if [ -f "$GITHUB_WORKSPACE/src/dist/report.html" ]; then
+            cp "$GITHUB_WORKSPACE/src/dist/report.html" gh-pages/monthly-report/index.html
           else
             echo "<html><body><h2>Monthly report not available for this run.</h2></body></html>" \
               > gh-pages/monthly-report/index.html
           fi
 
-          if [ -d "target/site/allure-maven-plugin" ]; then
-            cp -r target/site/allure-maven-plugin/. gh-pages/regression-report/
+          if [ -d "$GITHUB_WORKSPACE/target/site/allure-maven-plugin" ]; then
+            cp -r "$GITHUB_WORKSPACE/target/site/allure-maven-plugin/." gh-pages/regression-report/
           else
-            echo "<html><body><h2>Allure report not available for this run — tests may have failed before results were generated.</h2></body></html>" \
+            echo "<html><body><h2>Allure report not available for this run.</h2></body></html>" \
               > gh-pages/regression-report/index.html
           fi
 
@@ -300,33 +302,27 @@ jobs:
             <div class="badge">QA Automation · Java · PHPTRAVELS</div>
             <h1>Java Test <span>Dashboard</span></h1>
             <p class="sub">Sanity, regression and monthly QA reports for the Java Playwright suite.</p>
-
             <div class="section-label">Reports</div>
             <div class="cards">
-
               <a href="./sanity-report/index.html" class="card blue">
                 <div class="card-icon">⚡</div>
                 <div class="card-title">Sanity Report</div>
                 <div class="card-desc">Latest sanity run — fast smoke-check across core flows, published on every push and twice daily.</div>
                 <div class="card-link">View report →</div>
               </a>
-
               <a href="./regression-report/index.html" class="card green">
                 <div class="card-icon">🧪</div>
                 <div class="card-title">Regression Report</div>
                 <div class="card-desc">Full regression Allure report with logs, screenshots, videos and step-level details.</div>
                 <div class="card-link">View report →</div>
               </a>
-
               <a href="./monthly-report/index.html" class="card orange">
                 <div class="card-icon">📊</div>
                 <div class="card-title">Monthly QA Report</div>
                 <div class="card-desc">Trends, pass rates and run history aggregated across the full month.</div>
                 <div class="card-link">View report →</div>
               </a>
-
             </div>
-
             <div class="footer">
               Last updated by regression workflow: ${{ env.REPORT_DATE }} &nbsp;·&nbsp; Branch: <span>java-reports</span>
             </div>
