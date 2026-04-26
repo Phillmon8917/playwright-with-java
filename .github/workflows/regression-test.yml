@@ -237,8 +237,19 @@ jobs:
           mkdir -p gh-pages/monthly-report
           mkdir -p gh-pages/regression-report
 
-          cp src/dist/report.html gh-pages/monthly-report/index.html
-          cp -r target/site/allure-maven-plugin/. gh-pages/regression-report/
+          if [ -f "src/dist/report.html" ]; then
+            cp src/dist/report.html gh-pages/monthly-report/index.html
+          else
+            echo "<html><body><h2>Monthly report not available for this run.</h2></body></html>" \
+              > gh-pages/monthly-report/index.html
+          fi
+
+          if [ -d "target/site/allure-maven-plugin" ]; then
+            cp -r target/site/allure-maven-plugin/. gh-pages/regression-report/
+          else
+            echo "<html><body><h2>Allure report not available for this run — tests may have failed before results were generated.</h2></body></html>" \
+              > gh-pages/regression-report/index.html
+          fi
 
           cat > gh-pages/index.html << 'HTML'
           <!DOCTYPE html>

@@ -146,7 +146,12 @@ jobs:
         run: |
           mkdir -p gh-pages/sanity-report
 
-          cp -r target/site/allure-maven-plugin/. gh-pages/sanity-report/
+          if [ -d "target/site/allure-maven-plugin" ]; then
+            cp -r target/site/allure-maven-plugin/. gh-pages/sanity-report/
+          else
+            echo "<html><body><h2>Allure report not available for this run — tests may have failed before results were generated.</h2></body></html>" \
+              > gh-pages/sanity-report/index.html
+          fi
 
           if [ ! -f gh-pages/index.html ]; then
             cat > gh-pages/index.html << 'HTML'
