@@ -1,0 +1,12 @@
+[2026-04-26 07:52:35] [INFO] Starting: verifyNavigationToContactUsPage()
+[2026-04-26 07:52:35] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-26 07:52:35] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-26 07:52:35] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-26 07:52:35] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-26 07:52:53] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-26 07:52:53] [INFO] verifyNavigationToContactUsPage - Successfully hovered over Company
+[2026-04-26 07:52:55] [INFO] verifyNavigationToContactUsPage - Successfully clicked Contact Us
+[2026-04-26 07:52:55] [INFO] verifyNavigationToContactUsPage - Contact Us Page matched with status 200 and method GET
+[2026-04-26 07:52:56] [INFO] verifyNavigationToContactUsPage - Contact Us Header is visible
+[2026-04-26 07:52:56] [INFO] Contact Us Page is opened successfully
+[2026-04-26 07:52:56] [INFO] Assertion Passed - Navigation to contact us page is successful

@@ -1,0 +1,17 @@
+[2026-04-26 07:50:34] [INFO] Starting: verifyAllQuickSearchTabsAreVisible()
+[2026-04-26 07:50:34] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-26 07:50:34] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-26 07:50:34] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-26 07:50:34] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-26 07:50:52] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-26 07:50:54] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Visa Quick Search Tab
+[2026-04-26 07:50:54] [INFO] verifyAllQuickSearchTabsAreVisible - Check Visa Search Button is visible
+[2026-04-26 07:50:55] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Tours Quick Search Tab
+[2026-04-26 07:50:55] [INFO] verifyAllQuickSearchTabsAreVisible - Tours Search Button is visible
+[2026-04-26 07:50:56] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Cars Quick Search Tab
+[2026-04-26 07:50:56] [INFO] verifyAllQuickSearchTabsAreVisible - Cars Search Button is visible
+[2026-04-26 07:50:57] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Flights Quick Search Tab
+[2026-04-26 07:50:57] [INFO] verifyAllQuickSearchTabsAreVisible - Flights Search Button is visible
+[2026-04-26 07:50:58] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Stays Quick Search Tab
+[2026-04-26 07:50:58] [INFO] verifyAllQuickSearchTabsAreVisible - Stays Search Button is visible
+[2026-04-26 07:50:58] [INFO] Assertion Passed - All quick search tabs are visible
