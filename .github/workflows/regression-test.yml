@@ -8,8 +8,8 @@ permissions:
 
 on:
   schedule:
-    - cron: "0 6 * * *" # runs on develop
-    - cron: "0 7 * * *" # runs on qa
+    - cron: "0 6 * * *" # 06:00 UTC → develop
+    - cron: "0 7 * * *" # 07:00 UTC → qa
   workflow_dispatch:
     inputs:
       tag:
@@ -54,7 +54,7 @@ jobs:
   # Resolves which branch to run on.
   # - Manual: uses the selected branch input
   # - Scheduled 06:00 UTC → develop
-  # - Scheduled 07:00 UTC → qa
+  # - Scheduled 07:00 UTC → qa  (1 hour after develop)
   resolve-branch:
     runs-on: ubuntu-latest
     outputs:
