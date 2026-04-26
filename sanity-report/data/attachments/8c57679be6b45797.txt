@@ -1,0 +1,22 @@
+[2026-04-26 16:08:38] [INFO] Starting: verifyPasswordInputValidation()
+[2026-04-26 16:08:38] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-26 16:08:38] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-26 16:08:38] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-26 16:08:38] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-26 16:09:08] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-26 16:09:09] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-04-26 16:09:11] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-04-26 16:09:11] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-26 16:09:16] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-04-26 16:09:16] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-26 16:09:18] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-04-26 16:09:18] [INFO] Agent Signup Page is opened successfully
+[2026-04-26 16:09:19] [INFO] fillFirstNameInput - Successfully filled First Name with value: Reva
+[2026-04-26 16:09:21] [INFO] fillLastNameInput - Successfully filled Last Name with value: Halvorson
+[2026-04-26 16:09:22] [INFO] fillEmailInput - Successfully filled Email with value: *********************
+[2026-04-26 16:09:23] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: ********
+[2026-04-26 16:09:23] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-04-26 16:09:24] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-04-26 16:09:24] [INFO] getValidationMessage - Native validation message found for field: password
+[2026-04-26 16:09:24] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-04-26 16:09:24] [INFO] Assertion Passed - Password input validation is successful
