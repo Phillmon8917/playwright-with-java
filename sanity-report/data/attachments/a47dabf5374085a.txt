@@ -1,0 +1,22 @@
+[2026-04-27 07:28:58] [INFO] Starting: verifyPasswordInputValidation()
+[2026-04-27 07:28:58] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-27 07:28:58] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-27 07:28:58] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-27 07:28:58] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-27 07:29:17] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-27 07:29:19] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-04-27 07:29:20] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-04-27 07:29:20] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-27 07:29:23] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-04-27 07:29:23] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-27 07:29:25] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-04-27 07:29:25] [INFO] Agent Signup Page is opened successfully
+[2026-04-27 07:29:27] [INFO] fillFirstNameInput - Successfully filled First Name with value: Marco
+[2026-04-27 07:29:28] [INFO] fillLastNameInput - Successfully filled Last Name with value: Denesik
+[2026-04-27 07:29:28] [INFO] fillEmailInput - Successfully filled Email with value: ***********************
+[2026-04-27 07:29:28] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: ********
+[2026-04-27 07:29:28] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-04-27 07:29:29] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-04-27 07:29:29] [INFO] getValidationMessage - Native validation message found for field: password
+[2026-04-27 07:29:29] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-04-27 07:29:29] [INFO] Assertion Passed - Password input validation is successful
