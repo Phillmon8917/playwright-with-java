@@ -1,0 +1,10 @@
+[2026-04-27 06:47:32] [INFO] Starting: verifyDownloadAppSection()
+[2026-04-27 06:47:32] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-27 06:47:32] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-27 06:47:32] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-27 06:47:32] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-27 06:47:53] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-27 06:47:56] [INFO] verifyDownloadAppSection - Successfully JS-clicked Download App Navigation Link
+[2026-04-27 06:48:01] [INFO] verifyDownloadAppSection - URL values match: actual="https://play.google.com/store/apps/details?id=com.phptravelsnative", expected="https://play.google.com/store/apps/details?id=com.phptravelsnative"
+[2026-04-27 06:48:01] [INFO] verifyDownloadAppSection - Page Title values match: actual="PHPTRAVELS - Apps on Google Play", expected="PHPTRAVELS - Apps on Google Play"
+[2026-04-27 06:48:01] [INFO] Assertion Passed - Navigation to download app page is successful
