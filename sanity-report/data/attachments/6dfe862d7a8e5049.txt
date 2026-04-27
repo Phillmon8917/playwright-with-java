@@ -1,0 +1,14 @@
+[2026-04-27 07:59:39] [INFO] Starting: verifyHeaderNavigationLinksArePresent()
+[2026-04-27 07:59:39] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-27 07:59:39] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-27 07:59:39] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-27 07:59:39] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-27 08:00:00] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-27 08:00:00] [INFO] verifyThatHeaderNavLinksAreVisible - Services is visible
+[2026-04-27 08:00:00] [INFO] verifyThatHeaderNavLinksAreVisible - Company is visible
+[2026-04-27 08:00:01] [INFO] verifyThatHeaderNavLinksAreVisible - Blogs is visible
+[2026-04-27 08:00:01] [INFO] verifyThatHeaderNavLinksAreVisible - Language is visible
+[2026-04-27 08:00:01] [INFO] verifyThatHeaderNavLinksAreVisible - Currency is visible
+[2026-04-27 08:00:01] [INFO] verifyThatHeaderNavLinksAreVisible - Login is visible
+[2026-04-27 08:00:01] [INFO] verifyThatHeaderNavLinksAreVisible - Signup is visible
+[2026-04-27 08:00:01] [INFO] Assertion Passed - Header navigation links are present
