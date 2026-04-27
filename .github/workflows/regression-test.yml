@@ -8,8 +8,8 @@ permissions:
 
 on:
   schedule:
-    - cron: "20 7 * * *" # runs on develop (08:42 SAST)
-    - cron: "10 7 * * *" # runs on qa (09:42 SAST)
+    - cron: "0 4 * * *" # 06:00 SAST -> develop
+    - cron: "0 5 * * *" # 07:00 SAST -> qa
   workflow_dispatch:
     inputs:
       tag:
@@ -53,8 +53,8 @@ on:
 jobs:
   # Resolves which branch to run on.
   # - Manual: uses the selected branch input
-  # - Scheduled 06:42 UTC (08:42 SAST) -> develop
-  # - Scheduled 07:42 UTC (09:42 SAST) -> qa
+  # - Scheduled 04:00 UTC (06:00 SAST) -> develop
+  # - Scheduled 05:00 UTC (07:00 SAST) -> qa
   resolve-branch:
     runs-on: ubuntu-latest
     outputs:
@@ -67,7 +67,7 @@ jobs:
             echo "branch=${{ inputs.branch }}" >> $GITHUB_OUTPUT
           else
             HOUR=$(date -u +%H)
-            if [ "$HOUR" = "06" ]; then
+            if [ "$HOUR" = "04" ]; then
               echo "branch=develop" >> $GITHUB_OUTPUT
             else
               echo "branch=qa" >> $GITHUB_OUTPUT
