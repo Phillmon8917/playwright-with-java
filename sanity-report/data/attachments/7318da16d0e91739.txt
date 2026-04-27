@@ -1,0 +1,10 @@
+[2026-04-27 12:17:52] [INFO] Starting: verifyNavigationToVisaBookingPage()
+[2026-04-27 12:17:52] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-27 12:17:52] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-27 12:17:52] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-27 12:17:52] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-27 12:18:18] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-27 12:18:19] [INFO] verifyNavigationToVisaBookingPage - Successfully clicked Services
+[2026-04-27 12:18:20] [INFO] verifyNavigationToVisaBookingPage - Successfully clicked Visa Booking
+[2026-04-27 12:18:20] [INFO] verifyNavigationToVisaBookingPage - Visa Booking Page matched with status 200 and method GET
+[2026-04-27 12:18:20] [INFO] Assertion Passed - Navigation to visa booking page is successful
