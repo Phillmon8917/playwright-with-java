@@ -13,8 +13,8 @@ on:
       - qa
       - main
   schedule:
-    - cron: "0 8 * * *" # 08:00 UTC -> develop
-    - cron: "0 13 * * *" # 13:00 UTC -> qa
+    - cron: "46 6 * * *" # 08:42 SAST -> develop
+    - cron: "03 7 * * *" # 09:42 SAST -> qa
   workflow_dispatch:
     inputs:
       tag:
@@ -49,8 +49,8 @@ on:
 
 jobs:
   # Resolves which branch to run sanity on.
-  # - Scheduled 08:00 UTC -> develop
-  # - Scheduled 13:00 UTC -> qa
+  # - Scheduled 06:42 UTC (08:42 SAST) -> develop
+  # - Scheduled 07:42 UTC (09:42 SAST) -> qa
   # - PR              -> uses github.head_ref (the PR source branch, not the merge ref)
   # - Manual          -> uses github.ref_name
   resolve-branch:
@@ -63,7 +63,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
             HOUR=$(date -u +%H)
-            if [ "$HOUR" = "08" ]; then
+            if [ "$HOUR" = "06" ]; then
               echo "branch=develop" >> $GITHUB_OUTPUT
             else
               echo "branch=qa" >> $GITHUB_OUTPUT
