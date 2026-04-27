@@ -13,8 +13,8 @@ on:
       - qa
       - main
   schedule:
-    - cron: "46 6 * * *" # 08:42 SAST -> develop
-    - cron: "03 7 * * *" # 09:42 SAST -> qa
+    - cron: "01 7 * * *" # 08:42 SAST -> develop
+    - cron: "07 7 * * *" # 09:42 SAST -> qa
   workflow_dispatch:
     inputs:
       tag:
