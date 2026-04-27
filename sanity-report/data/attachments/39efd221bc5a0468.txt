@@ -1,0 +1,10 @@
+[2026-04-27 06:57:51] [INFO] Starting: verifyNavigationToToursBookingPage()
+[2026-04-27 06:57:51] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-27 06:57:51] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-27 06:57:51] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-27 06:57:51] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-27 06:58:21] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-27 06:58:23] [INFO] verifyNavigationToToursBooking - Successfully hovered over Services
+[2026-04-27 06:58:25] [INFO] verifyNavigationToToursBooking - Successfully clicked Tours
+[2026-04-27 06:58:25] [INFO] verifyNavigationToToursBooking - Tours Page matched with status 200 and method GET
+[2026-04-27 06:58:25] [INFO] Assertion Passed - Navigation to tours booking page is successful

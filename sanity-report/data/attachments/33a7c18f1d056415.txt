@@ -1,0 +1,22 @@
+[2026-04-27 06:57:58] [INFO] Starting: verifyPasswordInputValidation()
+[2026-04-27 06:57:58] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-27 06:57:59] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-27 06:57:59] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-27 06:57:59] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-27 06:58:25] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-27 06:58:28] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-04-27 06:58:30] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-04-27 06:58:30] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-27 06:58:37] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-04-27 06:58:37] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-04-27 06:58:39] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-04-27 06:58:39] [INFO] Agent Signup Page is opened successfully
+[2026-04-27 06:58:42] [INFO] fillFirstNameInput - Successfully filled First Name with value: Reginald
+[2026-04-27 06:58:43] [INFO] fillLastNameInput - Successfully filled Last Name with value: Pagac
+[2026-04-27 06:58:43] [INFO] fillEmailInput - Successfully filled Email with value: ***************************
+[2026-04-27 06:58:44] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: ***********
+[2026-04-27 06:58:44] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-04-27 06:58:45] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-04-27 06:58:45] [INFO] getValidationMessage - Native validation message found for field: password
+[2026-04-27 06:58:45] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-04-27 06:58:45] [INFO] Assertion Passed - Password input validation is successful
