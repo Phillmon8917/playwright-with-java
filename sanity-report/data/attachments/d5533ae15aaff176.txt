@@ -1,0 +1,18 @@
+[2026-04-28 11:47:18] [INFO] Starting: verifyNavigationToVisaBookingPage()
+[2026-04-28 11:47:18] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-28 11:47:19] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-28 11:47:19] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-28 11:47:19] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-28 11:47:42] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-28 11:47:44] [INFO] verifyNavigationToVisaBookingPage - Successfully clicked Services
+[2026-04-28 11:50:24] [ERROR] verifyNavigationToVisaBookingPage - Failed to click Visa Booking: Error {
+  message='Timeout 160000ms exceeded.
+  name='TimeoutError
+  stack='TimeoutError: Timeout 160000ms exceeded.
+    at ProgressController.run (/tmp/playwright-java-9989034791852897667/package/lib/server/progress.js:92:28)
+    at FrameDispatcher._runCommand (/tmp/playwright-java-9989034791852897667/package/lib/server/dispatchers/dispatcher.js:91:31)
+    at DispatcherConnection.dispatch (/tmp/playwright-java-9989034791852897667/package/lib/server/dispatchers/dispatcher.js:325:39)
+}
+Call log:
+-   - waiting for getByRole(AriaRole.NAVIGATION).getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("chevron_right Visa Booking"))
+
