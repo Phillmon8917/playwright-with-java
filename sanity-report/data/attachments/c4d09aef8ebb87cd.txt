@@ -1,0 +1,10 @@
+[2026-04-28 12:22:09] [INFO] Starting: verifyNavigationToCarsBookingPage()
+[2026-04-28 12:22:09] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-28 12:22:09] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-28 12:22:09] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-28 12:22:09] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-28 12:22:33] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-28 12:22:34] [INFO] verifyNavigationToCarsBooking - Successfully hovered over Services
+[2026-04-28 12:22:35] [INFO] verifyNavigationToCarsBooking - Successfully clicked Cars
+[2026-04-28 12:22:35] [INFO] verifyNavigationToCarsBooking - Cars Page matched with status 200 and method GET
+[2026-04-28 12:22:35] [INFO] Assertion Passed - Navigation to cars booking page is successful
