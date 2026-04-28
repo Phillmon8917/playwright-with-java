@@ -1,0 +1,9 @@
+[2026-04-28 06:28:54] [INFO] Starting: verifyNavigationToDisruptionsPage()
+[2026-04-28 06:28:54] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-28 06:28:54] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-28 06:28:54] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-28 06:28:54] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-28 06:29:16] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-28 06:29:18] [INFO] verifyNavigationToDisruptionsPage - Successfully JS-clicked Disruptions Navigation Link
+[2026-04-28 06:29:18] [INFO] verifyNavigationToDisruptionsPage - Disruptions Page matched with status 200 and method GET
+[2026-04-28 06:29:18] [INFO] Assertion Passed - Navigation to disruptions page is successful
