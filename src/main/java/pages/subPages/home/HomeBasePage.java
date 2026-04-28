@@ -1,11 +1,12 @@
 package pages.subPages.home;
 
+import java.util.regex.Pattern;
+
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
-import pages.basePage.BasePage;
 
-import java.util.regex.Pattern;
+import pages.basePage.BasePage;
 
 public abstract class HomeBasePage extends BasePage {
 
@@ -84,6 +85,8 @@ public abstract class HomeBasePage extends BasePage {
     protected final Locator flightsSearchButton;
     protected final Locator staysQuickSearchTab;
     protected final Locator staysSearchButton;
+    protected final Locator userProfile;
+    protected final Locator dashBoardMenuItem;
 
     protected HomeBasePage(Page page) {
         super(page);
@@ -163,6 +166,9 @@ public abstract class HomeBasePage extends BasePage {
         this.flightsSearchButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(Pattern.compile("Search Flights|Searching", Pattern.CASE_INSENSITIVE)));
         this.staysQuickSearchTab = page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("hotel Stays"));
         this.staysSearchButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(Pattern.compile("Search Hotels|Searching", Pattern.CASE_INSENSITIVE)));
+
+        this.userProfile = page.locator("div.group >> button:has(span:has-text('account_circle'))");
+        this.dashBoardMenuItem = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("dashboard Dashboard"));
     }
 
     /**

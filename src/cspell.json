@@ -33,7 +33,8 @@
     "nums",
     "println",
     "nbfs",
-    "nbhost"
+    "nbhost",
+    "favourites"
   ],
   "ignorePaths": ["node_modules", "dist", "build", "target", ".git"]
 }

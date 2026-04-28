@@ -291,6 +291,7 @@ public class HomePage extends HomeBasePage {
         LoggingUtil.info("Customer Signup Page is opened successfully");
     }
 
+
     /**
      * Verifies navigation to the agent signup page and confirms the agent registration header is visible.
      */
@@ -536,8 +537,9 @@ public class HomePage extends HomeBasePage {
         );
     }
 
+
     /**
-     * Verifies navigation to the Facebook page from the site footer or social links.
+     * Verifies navigation to the Facebook page.
      */
     public void verifyNavigationToFacebookPage() {
         modulars.network.assertNetworkRequest(
@@ -547,6 +549,21 @@ public class HomePage extends HomeBasePage {
                 "GET",
                 "Facebook Page",
                 "verifyNavigationToFacebookPage"
+        );
+    }
+
+    /**
+     * Navigates to the dashboard page by hovering over the user profile and clicking the dashboard menu item.
+     */
+    public void navigateToDashboardPage(){
+        this.modulars.elements.hoverElement(this.userProfile, "User Profile", "navigateToDashboardPage");
+        this.modulars.network.assertNetworkRequest(
+                "https://phptravels.net/dashboard",
+                200,
+                () -> this.modulars.elements.jsClick(this.dashBoardMenuItem, "Dashboard Navigation Menu Item", "navigateToDashboardPage"),
+                "GET",
+                "Dashboard Page",
+                "navigateToDashboardPage"
         );
     }
 }

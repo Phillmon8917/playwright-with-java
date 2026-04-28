@@ -1,13 +1,16 @@
 package tests.authentication.admin;
 
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+
 import utils.credentials.Credentials;
 import utils.credentials.CredentialsOptions;
 import utils.credentials.CredentialsProvider;
 import utils.logger.LoggingUtil;
 
-import java.nio.file.Paths;
-
+@Order(1)
 public class AdminAuthTest extends AdminAuthBaseTest {
 
     @Test

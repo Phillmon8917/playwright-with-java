@@ -3,6 +3,7 @@ package modulars.elements;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.options.MouseButton;
 import com.microsoft.playwright.options.WaitForSelectorState;
+
 import utils.logger.LoggingUtil;
 
 public class ElementActions {
@@ -24,11 +25,11 @@ public class ElementActions {
     }
 
     /**
-     * Fills the given element with the given value.
-     * Set encrypt=true to mask the value in logs.
+     * Fills the given element with the given value. Set encrypt=true to mask
+     * the value in logs.
      */
     public void fillTheElement(Locator locator, String value, String locatorName,
-                               String methodName, boolean encrypt) {
+            String methodName, boolean encrypt) {
         try {
             locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
             locator.click(new Locator.ClickOptions().setForce(true));
@@ -42,7 +43,9 @@ public class ElementActions {
         }
     }
 
-    /** Overload without encryption flag — defaults to false. */
+    /**
+     * Overload without encryption flag — defaults to false.
+     */
     public void fillTheElement(Locator locator, String value, String locatorName, String methodName) {
         fillTheElement(locator, value, locatorName, methodName, false);
     }
@@ -51,7 +54,7 @@ public class ElementActions {
      * Types text into the element sequentially with a delay between characters.
      */
     public void typeSequentially(Locator locator, String text, String locatorName,
-                                 String methodName, int delayMs) {
+            String methodName, int delayMs) {
         try {
             locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
             locator.click(new Locator.ClickOptions().setForce(true));
@@ -63,7 +66,9 @@ public class ElementActions {
         }
     }
 
-    /** Overload with default 100ms delay. */
+    /**
+     * Overload with default 100ms delay.
+     */
     public void typeSequentially(Locator locator, String text, String locatorName, String methodName) {
         typeSequentially(locator, text, locatorName, methodName, 100);
     }
@@ -83,11 +88,11 @@ public class ElementActions {
     }
 
     /**
-     * Clicks on the given element.
-     * clickType: null = left click (force), "double" = double click, "right" = right click.
+     * Clicks on the given element. clickType: null = left click (force),
+     * "double" = double click, "right" = right click.
      */
     public void clickElement(Locator locator, String locatorName,
-                             String methodName, String clickType) {
+            String methodName, String clickType) {
         try {
             locator.scrollIntoViewIfNeeded();
             locator.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -109,7 +114,9 @@ public class ElementActions {
         }
     }
 
-    /** Overload with no clickType — defaults to standard left click. */
+    /**
+     * Overload with no clickType — defaults to standard left click.
+     */
     public void clickElement(Locator locator, String locatorName, String methodName) {
         clickElement(locator, locatorName, methodName, null);
     }

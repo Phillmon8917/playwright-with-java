@@ -19,6 +19,21 @@ for FILE in $JAVA_FILES; do
         FAILED=1
     fi
     
+    if grep -n "Thread\.sleep" "$FILE"; then
+        echo "❌ [$FILE] Remove Thread.sleep - use proper async/wait mechanisms instead"
+        FAILED=1
+    fi
+    
+    if grep -n "page\.waitForTimeout" "$FILE"; then
+        echo "❌ [$FILE] Remove page.waitForTimeout - use explicit conditions/waits instead"
+        FAILED=1
+    fi
+    
+    if grep -n "page\.pause" "$FILE"; then
+        echo "❌ [$FILE] Remove page.pause - this is a debugging tool and must not be committed"
+        FAILED=1
+    fi
+    
 done
 
 echo ""

@@ -1,13 +1,18 @@
 package modulars.assertions;
 
-import com.microsoft.playwright.Locator;
-import utils.logger.LoggingUtil;
-
 import java.util.regex.Pattern;
 
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.assertions.LocatorAssertions;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
+import utils.env.EnvUtil;
+import utils.logger.LoggingUtil;
+
 public class ElementAssertions {
+
+    static final double ACTION_TIMEOUT = Double.parseDouble(
+            EnvUtil.get("ACTION_TIMEOUT").isEmpty() ? "30000" : EnvUtil.get("ACTION_TIMEOUT"));
 
     /**
      * Asserts that the provided element matches the expected state.
@@ -18,14 +23,19 @@ public class ElementAssertions {
      * @param methodName the calling method name for logging
      */
     public void assertElementState(Locator locator, String state,
-                                   String locatorName, String methodName) {
+            String locatorName, String methodName) {
         try {
             switch (state) {
-                case "visible"  -> assertThat(locator).isVisible();
-                case "hidden"   -> assertThat(locator).isHidden();
-                case "enabled"  -> assertThat(locator).isEnabled();
-                case "disabled" -> assertThat(locator).isDisabled();
-                default -> throw new IllegalArgumentException("Unknown state: " + state);
+                case "visible" ->
+                    assertThat(locator).isVisible();
+                case "hidden" ->
+                    assertThat(locator).isHidden();
+                case "enabled" ->
+                    assertThat(locator).isEnabled();
+                case "disabled" ->
+                    assertThat(locator).isDisabled();
+                default ->
+                    throw new IllegalArgumentException("Unknown state: " + state);
             }
             LoggingUtil.info(methodName + " - " + locatorName + " is " + state);
         } catch (Exception err) {
@@ -45,19 +55,25 @@ public class ElementAssertions {
      * @param attrName the attribute name when performing an attribute assertion
      */
     public void assertElementProperty(Locator locator, String type, Object expected,
-                                      String locatorName, String methodName, String attrName) {
+            String locatorName, String methodName, String attrName) {
         try {
             switch (type) {
-                case "text"  -> assertThat(locator).hasText(expected.toString());
-                case "value" -> assertThat(locator).hasValue(expected.toString());
+                case "text" ->
+                    assertThat(locator).hasText(expected.toString());
+                case "value" ->
+                    assertThat(locator).hasValue(expected.toString());
                 case "attribute" -> {
-                    if (attrName == null)
+                    if (attrName == null) {
                         throw new IllegalArgumentException("attrName must be provided for attribute assertion");
+                    }
                     assertThat(locator).hasAttribute(attrName, expected.toString());
                 }
-                case "class" -> assertThat(locator).hasClass(Pattern.compile(expected.toString()));
-                case "count" -> assertThat(locator).hasCount((int) expected);
-                default -> throw new IllegalArgumentException("Unknown type: " + type);
+                case "class" ->
+                    assertThat(locator).hasClass(Pattern.compile(expected.toString()));
+                case "count" ->
+                    assertThat(locator).hasCount((int) expected);
+                default ->
+                    throw new IllegalArgumentException("Unknown type: " + type);
             }
             String attrSuffix = attrName != null ? " for attribute \"" + attrName + "\"" : "";
             LoggingUtil.info(methodName + " - " + locatorName + " " + type
@@ -79,7 +95,7 @@ public class ElementAssertions {
      * @param methodName the calling method name for logging
      */
     public void assertElementProperty(Locator locator, String type, Object expected,
-                                      String locatorName, String methodName) {
+            String locatorName, String methodName) {
         assertElementProperty(locator, type, expected, locatorName, methodName, null);
     }
 
@@ -93,7 +109,7 @@ public class ElementAssertions {
      * @param type the text assertion mode, such as exact or partial
      */
     public void assertElementText(Locator locator, String expected, String locatorName,
-                                  String methodName, String type) {
+            String methodName, String type) {
         try {
             if ("exact".equals(type)) {
                 assertThat(locator).hasText(expected);
@@ -117,10 +133,9 @@ public class ElementAssertions {
      * @param methodName the calling method name for logging
      */
     public void assertElementText(Locator locator, String expected,
-                                  String locatorName, String methodName) {
+            String locatorName, String methodName) {
         assertElementText(locator, expected, locatorName, methodName, "exact");
     }
-
 
     /**
      * Asserts that an integer value is greater than the provided threshold.
@@ -143,56 +158,38 @@ public class ElementAssertions {
     }
 
     /**
-     * Polls the element text until its numeric value becomes greater than the threshold.
+     * Polls using Playwright's retry engine until the element's text content
+     * parses as an integer greater than the threshold, or
+     * {@code ACTION_TIMEOUT} expires.
      *
      * @param locator the Playwright locator for the target element
      * @param threshold the threshold the parsed numeric value must exceed
      * @param locatorName the friendly name of the locator for logging
      * @param methodName the calling method name for logging
-     * @param timeoutMs the maximum polling time in milliseconds
-     * @param intervalMs the delay between polling attempts in milliseconds
-     * @throws InterruptedException if the polling sleep is interrupted
      */
-    public void pollUntilGreaterThan(Locator locator, int threshold, String locatorName,
-                                     String methodName, int timeoutMs, int intervalMs)
-            throws InterruptedException {
-        long start = System.currentTimeMillis();
+    public void pollUntilGreaterThan(Locator locator, int threshold,
+            String locatorName, String methodName) {
         try {
-            while (System.currentTimeMillis() - start < timeoutMs) {
-                String text = locator.textContent();
-                try {
-                    int value = Integer.parseInt(text == null ? "" : text.trim());
-                    if (value > threshold) {
-                        LoggingUtil.info(methodName + " - " + locatorName
-                                + " value (" + value + ") exceeded " + threshold);
-                        return;
-                    }
-                } catch (NumberFormatException ignored) {}
-                Thread.sleep(intervalMs);
+            assertThat(locator).hasText(
+                    Pattern.compile("\\d+"),
+                    new LocatorAssertions.HasTextOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+
+            String text = locator.textContent();
+            int value = Integer.parseInt(text == null ? "" : text.trim());
+
+            if (value <= threshold) {
+                throw new RuntimeException(locatorName + " value (" + value
+                        + ") is not greater than " + threshold);
             }
-            throw new RuntimeException(locatorName + " did not exceed " + threshold
-                    + " within " + timeoutMs + "ms");
+
+            LoggingUtil.info(methodName + " - " + locatorName
+                    + " value (" + value + ") exceeded " + threshold);
         } catch (Exception err) {
             LoggingUtil.error(methodName + " - " + locatorName
                     + " failed to exceed " + threshold + ": " + err.getMessage());
             throw err;
         }
     }
-
-    /**
-     * Polls the element text until its numeric value becomes greater than the threshold.
-     *
-     * @param locator the Playwright locator for the target element
-     * @param threshold the threshold the parsed numeric value must exceed
-     * @param locatorName the friendly name of the locator for logging
-     * @param methodName the calling method name for logging
-     * @throws InterruptedException if the polling sleep is interrupted
-     */
-    public void pollUntilGreaterThan(Locator locator, int threshold,
-                                     String locatorName, String methodName) throws InterruptedException {
-        pollUntilGreaterThan(locator, threshold, locatorName, methodName, 30_000, 250);
-    }
-
 
     /**
      * Asserts that the provided string value is not null or empty.
@@ -215,34 +212,29 @@ public class ElementAssertions {
     }
 
     /**
-     * Polls the element until its text or value content becomes non-empty.
+     * Polls using Playwright's retry engine until the element's text or input
+     * value becomes non-empty, or {@code ACTION_TIMEOUT} expires.
      *
      * @param locator the Playwright locator for the target element
      * @param locatorName the friendly name of the locator for logging
      * @param methodName the calling method name for logging
-     * @param type the content type to poll, such as text or value
-     * @param timeoutMs the maximum polling time in milliseconds
-     * @param intervalMs the delay between polling attempts in milliseconds
-     * @throws InterruptedException if the polling sleep is interrupted
+     * @param type the content type to poll; {@code "value"} for input value,
+     * any other string for text content
      */
-    public void pollUntilNotEmpty(Locator locator, String locatorName, String methodName,
-                                  String type, int timeoutMs, int intervalMs)
-            throws InterruptedException {
-        long start = System.currentTimeMillis();
+    public void pollUntilNotEmpty(Locator locator, String locatorName,
+            String methodName, String type) {
         try {
-            while (System.currentTimeMillis() - start < timeoutMs) {
-                String content = "value".equals(type)
-                        ? locator.inputValue()
-                        : locator.textContent();
-                if (content != null && !content.trim().isEmpty()) {
-                    LoggingUtil.info(methodName + " - " + locatorName
-                            + " " + type + " became non-empty: \"" + content + "\"");
-                    return;
-                }
-                Thread.sleep(intervalMs);
+            Pattern nonEmpty = Pattern.compile(".+", Pattern.DOTALL);
+            if ("value".equals(type)) {
+                assertThat(locator).hasValue(
+                        nonEmpty,
+                        new LocatorAssertions.HasValueOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+            } else {
+                assertThat(locator).hasText(
+                        nonEmpty,
+                        new LocatorAssertions.HasTextOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
             }
-            throw new RuntimeException(locatorName + " " + type
-                    + " did not become non-empty within " + timeoutMs + "ms");
+            LoggingUtil.info(methodName + " - " + locatorName + " " + type + " became non-empty");
         } catch (Exception err) {
             LoggingUtil.error(methodName + " - " + locatorName
                     + " " + type + " polling failed: " + err.getMessage());
@@ -251,16 +243,15 @@ public class ElementAssertions {
     }
 
     /**
-     * Polls the element until its text content becomes non-empty.
+     * Polls using Playwright's retry engine until the element's text content
+     * becomes non-empty, or {@code ACTION_TIMEOUT} expires.
      *
      * @param locator the Playwright locator for the target element
      * @param locatorName the friendly name of the locator for logging
      * @param methodName the calling method name for logging
-     * @throws InterruptedException if the polling sleep is interrupted
      */
-    public void pollUntilNotEmpty(Locator locator, String locatorName,
-                                  String methodName) throws InterruptedException {
-        pollUntilNotEmpty(locator, locatorName, methodName, "text", 30_000, 250);
+    public void pollUntilNotEmpty(Locator locator, String locatorName, String methodName) {
+        pollUntilNotEmpty(locator, locatorName, methodName, "text");
     }
 
     /**
@@ -285,5 +276,137 @@ public class ElementAssertions {
             LoggingUtil.error(methodName + " - " + valueName + " comparison failed: " + err.getMessage());
             throw err;
         }
+    }
+
+    /**
+     * Asserts that the element contains the given string value.
+     *
+     * @param locator the Playwright locator for the target element
+     * @param type the content type to assert; {@code "class"}, {@code "text"},
+     *                    {@code "value"}, {@code "placeholder"}, or {@code "attribute"}
+     * @param expected the expected value
+     * @param locatorName the friendly name of the locator for logging
+     * @param methodName the calling method name for logging
+     * @param attrName the name of the attribute to assert if type is
+     * "attribute"
+     */
+    public void assertElementContains(Locator locator, String type, String expected,
+            String locatorName, String methodName, String attrName) {
+        try {
+            Pattern contains = Pattern.compile(".*" + Pattern.quote(expected) + ".*", Pattern.DOTALL);
+            switch (type) {
+                case "class" ->
+                    assertThat(locator).hasAttribute("class", contains,
+                            new LocatorAssertions.HasAttributeOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                case "text" ->
+                    assertThat(locator).containsText(expected,
+                            new LocatorAssertions.ContainsTextOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                case "value" ->
+                    assertThat(locator).hasValue(contains,
+                            new LocatorAssertions.HasValueOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                case "placeholder" ->
+                    assertThat(locator).hasAttribute("placeholder", contains,
+                            new LocatorAssertions.HasAttributeOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                case "attribute" -> {
+                    if (attrName == null) {
+                        throw new IllegalArgumentException("attrName must be provided for attribute type");
+                    }
+                    assertThat(locator).hasAttribute(attrName, contains,
+                            new LocatorAssertions.HasAttributeOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                }
+                default ->
+                    throw new IllegalArgumentException("Unknown type: " + type);
+            }
+            String attrSuffix = attrName != null ? " [attr=\"" + attrName + "\"]" : "";
+            LoggingUtil.info(methodName + " - " + locatorName + " " + type + attrSuffix
+                    + " contains expected: \"" + expected + "\"");
+        } catch (Exception err) {
+            LoggingUtil.error(methodName + " - " + locatorName + " " + type
+                    + " does not contain \"" + expected + "\": " + err.getMessage());
+            throw err;
+        }
+    }
+
+    /**
+     * Asserts that a specific property of the provided element contains the
+     * expected substring. Convenience overload for types that do not require an
+     * attribute name.
+     *
+     * @param locator the Playwright locator for the target element
+     * @param type the property type to check
+     * @param expected the substring expected to be present within the resolved
+     * property value
+     * @param locatorName the friendly name of the locator for logging
+     * @param methodName the calling method name for logging
+     */
+    public void assertElementContains(Locator locator, String type, String expected,
+            String locatorName, String methodName) {
+        assertElementContains(locator, type, expected, locatorName, methodName, null);
+    }
+
+    /**
+     * Asserts that a specific property of the provided element does not contain
+     * the unexpected substring. Convenience overload for types that do not
+     * require an attribute name.
+     *
+     * @param locator the Playwright locator for the target element
+     * @param type the property type to check
+     * @param unexpected the substring expected not to be present within the
+     * resolved property value
+     * @param locatorName the friendly name of the locator for logging
+     * @param methodName the calling method name for logging
+     */
+    public void assertElementNotContains(Locator locator, String type, String unexpected,
+            String locatorName, String methodName, String attrName) {
+        try {
+            Pattern notContains = Pattern.compile("^(?!.*" + Pattern.quote(unexpected) + ").*$", Pattern.DOTALL);
+            switch (type) {
+                case "class" ->
+                    assertThat(locator).hasAttribute("class", notContains,
+                            new LocatorAssertions.HasAttributeOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                case "text" ->
+                    assertThat(locator).not().containsText(unexpected,
+                            new LocatorAssertions.ContainsTextOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                case "value" ->
+                    assertThat(locator).hasValue(notContains,
+                            new LocatorAssertions.HasValueOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                case "placeholder" ->
+                    assertThat(locator).hasAttribute("placeholder", notContains,
+                            new LocatorAssertions.HasAttributeOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                case "attribute" -> {
+                    if (attrName == null) {
+                        throw new IllegalArgumentException("attrName must be provided for attribute type");
+                    }
+                    assertThat(locator).hasAttribute(attrName, notContains,
+                            new LocatorAssertions.HasAttributeOptions().setTimeout(ElementAssertions.ACTION_TIMEOUT));
+                }
+                default ->
+                    throw new IllegalArgumentException("Unknown type: " + type);
+            }
+            String attrSuffix = attrName != null ? " [attr=\"" + attrName + "\"]" : "";
+            LoggingUtil.info(methodName + " - " + locatorName + " " + type + attrSuffix
+                    + " does not contain: \"" + unexpected + "\"");
+        } catch (Exception err) {
+            LoggingUtil.error(methodName + " - " + locatorName + " " + type
+                    + " contains unexpected value \"" + unexpected + "\": " + err.getMessage());
+            throw err;
+        }
+    }
+
+    /**
+     * Asserts that a specific property of the provided element does NOT contain
+     * the expected substring. Convenience overload for types that do not
+     * require an attribute name.
+     *
+     * @param locator the Playwright locator for the target element
+     * @param type the property type to check
+     * @param unexpected the substring expected to be absent from the resolved
+     * property value
+     * @param locatorName the friendly name of the locator for logging
+     * @param methodName the calling method name for logging
+     */
+    public void assertElementNotContains(Locator locator, String type, String unexpected,
+            String locatorName, String methodName) {
+        assertElementNotContains(locator, type, unexpected, locatorName, methodName, null);
     }
 }

@@ -1,24 +1,42 @@
-[2026-04-25 13:13:17] [WARN] [ENV] Missing key → CI
-[2026-04-25 13:13:17] [INFO] Starting: adminLoginTest()
-[2026-04-25 13:13:17] [INFO] [ENV] Found in .env → BASE_URL
-[2026-04-25 13:13:17] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
-[2026-04-25 13:13:17] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
-[2026-04-25 13:13:18] [INFO] Deleted storage state for: admin
-[2026-04-25 13:13:18] [INFO] [ENV] Found in .env → TEST_TIMEOUT
-[2026-04-25 13:13:31] [WARN] [ENV] Missing key → CI
-[2026-04-25 13:13:32] [INFO] loadThePage - Loader disappeared (hidden or detached)
-[2026-04-25 13:13:32] [INFO] verifyNavigationToLoginPage - Successfully JS-clicked Login
-[2026-04-25 13:13:33] [INFO] verifyNavigationToLoginPage - Login Page matched with status 200 and method GET
-[2026-04-25 13:13:35] [INFO] verifyNavigationToLoginPage - Loader disappeared (hidden or detached)
-[2026-04-25 13:13:35] [INFO] verifyNavigationToLoginPage - Sign In To Your Account Button is visible
-[2026-04-25 13:13:35] [INFO] Login Page is opened successfully
-[2026-04-25 13:13:35] [INFO] [ENV] Found in .env → ADMIN_USERNAME
-[2026-04-25 13:13:35] [INFO] [ENV] Found in .env → ADMIN_PASSWORD
-[2026-04-25 13:13:35] [INFO] fillEmailInput - Successfully filled Email with value: ********************
-[2026-04-25 13:13:35] [INFO] fillPasswordInput - Successfully filled Password with value: *********
-[2026-04-25 13:13:35] [INFO] toggleRememberMe - Successfully JS-clicked Toggle Remember Me
-[2026-04-25 13:13:35] [INFO] clickLoginButton - Successfully JS-clicked Login
-[2026-04-25 13:13:36] [INFO] login - Loader was not present, continuing
-[2026-04-25 13:13:36] [INFO] verifySuccessfulLogin - Dashboard Header is visible
-[2026-04-25 13:13:36] [INFO] Login successful
-[2026-04-25 13:13:36] [INFO] Admin login test passed + storage state saved
+[2026-04-28 08:12:51] [INFO] [reporter] Known test IDs loaded: 48
+[2026-04-28 08:12:51] [INFO] Auth requested: CUSTOMER
+[2026-04-28 08:12:51] [INFO] Running CUSTOMER auth...
+[2026-04-28 08:12:51] [INFO] Deleted storage state for: customer
+[2026-04-28 08:12:59] [WARN] [ENV] Missing key → CI
+[2026-04-28 08:13:00] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-28 08:13:00] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-28 08:13:00] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-28 08:13:00] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-28 08:13:00] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-28 08:13:00] [INFO] [ENV] Found in .env → CUSTOMER_USERNAME
+[2026-04-28 08:13:00] [INFO] [ENV] Found in .env → CUSTOMER_PASSWORD
+[2026-04-28 08:13:12] [WARN] [ENV] Missing key → CI
+[2026-04-28 08:13:13] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-28 08:13:14] [INFO] verifyNavigationToLoginPage - Successfully JS-clicked Login
+[2026-04-28 08:13:14] [INFO] verifyNavigationToLoginPage - Login Page matched with status 200 and method GET
+[2026-04-28 08:13:14] [INFO] verifyNavigationToLoginPage - Loader was not present, continuing
+[2026-04-28 08:13:15] [INFO] verifyNavigationToLoginPage - Sign In To Your Account Button is visible
+[2026-04-28 08:13:15] [INFO] Login Page is opened successfully
+[2026-04-28 08:13:15] [INFO] fillEmailInput - Successfully filled Email with value: *******************
+[2026-04-28 08:13:15] [INFO] fillPasswordInput - Successfully filled Password with value: ********
+[2026-04-28 08:13:15] [INFO] toggleRememberMe - Successfully JS-clicked Toggle Remember Me
+[2026-04-28 08:13:15] [INFO] clickLoginButton - Successfully JS-clicked Login
+[2026-04-28 08:13:16] [INFO] login - Loader was not present, continuing
+[2026-04-28 08:13:16] [INFO] verifySuccessfulLogin - Dashboard Header is visible
+[2026-04-28 08:13:16] [INFO] Login successful
+[2026-04-28 08:13:17] [INFO] CUSTOMER auth completed
+[2026-04-28 08:13:17] [INFO] Starting: navigateToAllBookingsPage()
+[2026-04-28 08:13:17] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-28 08:13:18] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-28 08:13:18] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-28 08:13:18] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-28 08:13:31] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-28 08:13:31] [INFO] navigateToDashboardPage - Successfully hovered over User Profile
+[2026-04-28 08:13:31] [INFO] navigateToDashboardPage - Successfully JS-clicked Dashboard Navigation Menu Item
+[2026-04-28 08:13:32] [INFO] navigateToDashboardPage - Dashboard Page matched with status 200 and method GET
+[2026-04-28 08:13:34] [INFO] clickMyBookingsSideBar - Successfully retrieved attribute "class" from My Bookings Side Bar
+[2026-04-28 08:13:34] [INFO] My Bookings Side Bar Class Attribute: flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-150
+[2026-04-28 08:13:34] [INFO] clickMyBookingsSideBar - Successfully JS-clicked My Bookings Side Bar
+[2026-04-28 08:15:03] [INFO] [store] Run baacf541-3230-4c1d-909d-8f6829ba55a5 saved locally to 2026-04.json
+[2026-04-28 08:15:03] [INFO] [store] Saved 48 known test IDs locally
+[2026-04-28 08:15:03] [INFO] [reporter] Run baacf541-3230-4c1d-909d-8f6829ba55a5 | Month: 2026-04 | Passed: 0 | Failed: 1 | Skipped: 0 | New: 0

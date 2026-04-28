@@ -25,6 +25,7 @@ on:
           - customer
           - agent
           - admin
+          - userDashboard
       branch:
         description: "Branch to run on"
         required: false
