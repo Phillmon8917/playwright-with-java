@@ -1,0 +1,12 @@
+[2026-04-28 07:40:34] [INFO] Starting: verifyNavigationToAboutUsPage()
+[2026-04-28 07:40:34] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-28 07:40:34] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-28 07:40:34] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-28 07:40:34] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-28 07:40:56] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-28 07:40:57] [INFO] verifyNavigationToAboutUsPage - Successfully hovered over Company
+[2026-04-28 07:40:59] [INFO] verifyNavigationToAboutUsPage - Successfully clicked About Us
+[2026-04-28 07:40:59] [INFO] verifyNavigationToAboutUsPage - About Us Page matched with status 200 and method GET
+[2026-04-28 07:41:00] [INFO] verifyNavigationToAboutUsPage - About Us Header is visible
+[2026-04-28 07:41:00] [INFO] About Us Page is opened successfully
+[2026-04-28 07:41:00] [INFO] Assertion Passed - Navigation to about us page is successful
