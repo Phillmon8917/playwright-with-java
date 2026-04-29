@@ -1,0 +1,9 @@
+[2026-04-29 06:21:37] [INFO] Starting: verifyNavigationToAffiliateProgramPage()
+[2026-04-29 06:21:37] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-29 06:21:37] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-29 06:21:37] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-29 06:21:37] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-29 06:21:57] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-29 06:21:59] [INFO] verifyNavigationToAffiliateProgramPage - Successfully JS-clicked Affiliate Program Navigation Link
+[2026-04-29 06:21:59] [INFO] verifyNavigationToAffiliateProgramPage - Affiliate Program Page matched with status 200 and method GET
+[2026-04-29 06:21:59] [INFO] Assertion Passed - Navigation to affiliate program page is successful
