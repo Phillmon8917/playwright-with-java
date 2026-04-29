@@ -1,0 +1,10 @@
+[2026-04-29 07:33:48] [INFO] Starting: verifyNavigationToStaysBookingPage()
+[2026-04-29 07:33:48] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-29 07:33:49] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-29 07:33:49] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-29 07:33:49] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-29 07:34:06] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-29 07:34:09] [INFO] verifyNavigationToStaysBooking - Successfully hovered over Services
+[2026-04-29 07:34:11] [INFO] verifyNavigationToStaysBooking - Successfully clicked Stays
+[2026-04-29 07:34:11] [INFO] verifyNavigationToStaysBooking - Stays Page matched with status 200 and method GET
+[2026-04-29 07:34:11] [INFO] Assertion Passed - Navigation to stays booking page is successful

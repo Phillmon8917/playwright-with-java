@@ -1,0 +1,12 @@
+[2026-04-29 07:32:17] [INFO] Starting: verifyLanguageChange()
+[2026-04-29 07:32:18] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-29 07:32:18] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-29 07:32:18] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-29 07:32:18] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-29 07:32:36] [INFO] [ENV] Found in .env → CI
+[2026-04-29 07:32:37] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-29 07:32:38] [INFO] verifyLanguageChange - Successfully clicked Language
+[2026-04-29 07:32:39] [INFO] verifyLanguageChange - Successfully JS-clicked Russian
+[2026-04-29 07:32:41] [INFO] verifyLanguageChange - Language Button text assertion passed: Russian
+[2026-04-29 07:32:41] [INFO] Language is changed to Russian
+[2026-04-29 07:32:41] [INFO] Assertion Passed - Language change is successful
