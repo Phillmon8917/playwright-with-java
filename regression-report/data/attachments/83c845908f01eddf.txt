@@ -1,0 +1,10 @@
+[2026-04-30 06:25:14] [INFO] Starting: verifyNavigationToInvestorsPage()
+[2026-04-30 06:25:14] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-30 06:25:15] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-30 06:25:15] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-30 06:25:15] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-30 06:25:34] [INFO] [ENV] Found in .env → CI
+[2026-04-30 06:25:34] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-30 06:25:37] [INFO] verifyNavigationToInvestorsPage - Successfully JS-clicked Investors Navigation Link
+[2026-04-30 06:25:37] [INFO] verifyNavigationToInvestorsPage - Investors Page matched with status 200 and method GET
+[2026-04-30 06:25:37] [INFO] Assertion Passed - Navigation to investors page is successful

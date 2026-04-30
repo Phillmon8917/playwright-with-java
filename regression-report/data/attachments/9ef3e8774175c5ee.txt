@@ -1,0 +1,8 @@
+[2026-04-30 06:27:44] [INFO] Starting: verifyHomePageIsLoaded()
+[2026-04-30 06:27:44] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-30 06:27:44] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-30 06:27:44] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-30 06:27:44] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-30 06:28:04] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-30 06:28:05] [INFO] verifyPageLoaded - Logo is visible
+[2026-04-30 06:28:05] [INFO] Assertion Passed - Home Page is loaded
