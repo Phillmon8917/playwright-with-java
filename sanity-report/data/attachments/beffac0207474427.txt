@@ -1,0 +1,22 @@
+[2026-04-30 11:28:27] [INFO] Starting: customerLoginTest()
+[2026-04-30 11:28:27] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-30 11:28:27] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-30 11:28:27] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-30 11:28:27] [INFO] Deleted storage state for: customer
+[2026-04-30 11:28:27] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-30 11:28:43] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-30 11:28:44] [INFO] verifyNavigationToLoginPage - Successfully JS-clicked Login
+[2026-04-30 11:28:44] [INFO] verifyNavigationToLoginPage - Login Page matched with status 200 and method GET
+[2026-04-30 11:28:44] [INFO] verifyNavigationToLoginPage - Loader was not present, continuing
+[2026-04-30 11:28:46] [INFO] verifyNavigationToLoginPage - Sign In To Your Account Button is visible
+[2026-04-30 11:28:46] [INFO] Login Page is opened successfully
+[2026-04-30 11:28:46] [INFO] [ENV] Found in .env → CUSTOMER_USERNAME
+[2026-04-30 11:28:46] [INFO] [ENV] Found in .env → CUSTOMER_PASSWORD
+[2026-04-30 11:28:47] [INFO] fillEmailInput - Successfully filled Email with value: *******************
+[2026-04-30 11:28:47] [INFO] fillPasswordInput - Successfully filled Password with value: ********
+[2026-04-30 11:28:48] [INFO] toggleRememberMe - Successfully JS-clicked Toggle Remember Me
+[2026-04-30 11:28:48] [INFO] clickLoginButton - Successfully JS-clicked Login
+[2026-04-30 11:28:49] [INFO] login - Loader was not present, continuing
+[2026-04-30 11:28:50] [INFO] verifySuccessfulLogin - Dashboard Header is visible
+[2026-04-30 11:28:50] [INFO] Login successful
+[2026-04-30 11:28:50] [INFO] Customer login test passed + storage state saved

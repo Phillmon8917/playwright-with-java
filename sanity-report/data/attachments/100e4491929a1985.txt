@@ -1,0 +1,28 @@
+[2026-04-30 11:29:34] [INFO] Starting: verifySuccessfulCustomerSignup()
+[2026-04-30 11:29:34] [INFO] [ENV] Found in .env → BASE_URL
+[2026-04-30 11:29:34] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-04-30 11:29:34] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-04-30 11:29:34] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-04-30 11:29:54] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-04-30 11:29:55] [INFO] verifyNavigationToCustomerSignupPage - Successfully hovered over Signup
+[2026-04-30 11:29:56] [INFO] verifyNavigationToCustomerSignupPage - Successfully JS-clicked Customer Signup
+[2026-04-30 11:29:57] [INFO] verifyNavigationToCustomerSignupPage - Customer Signup Page matched with status 200 and method GET
+[2026-04-30 11:29:58] [INFO] verifyNavigationToCustomerSignupPage - Agent Registration Header is hidden
+[2026-04-30 11:29:58] [INFO] Customer Signup Page is opened successfully
+[2026-04-30 11:29:59] [INFO] extractSecurityCheckQuestion - Successfully retrieved text from Security Check Question
+[2026-04-30 11:29:59] [INFO] Security check question is: 
+                Security Check: What is ten plus seventeen? *
+            
+[2026-04-30 11:29:59] [INFO] Security question solved: 10 add 17 = 27
+[2026-04-30 11:29:59] [INFO] Security check answer is: 27
+[2026-04-30 11:30:01] [INFO] fillFirstNameInput - Successfully filled First Name with value: Rayford
+[2026-04-30 11:30:01] [INFO] fillLastNameInput - Successfully filled Last Name with value: Leannon
+[2026-04-30 11:30:01] [INFO] fillEmailInput - Successfully filled Email with value: ******************************
+[2026-04-30 11:30:01] [INFO] fillPasswordInput - Successfully filled Password with value: *********
+[2026-04-30 11:30:01] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: *********
+[2026-04-30 11:30:02] [INFO] fillSecurityCheckAnswerInput - Successfully filled Security Check Answer with value: 27
+[2026-04-30 11:30:02] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-04-30 11:30:02] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-04-30 11:30:03] [INFO] fillTheSignUpForm - Create Account matched with status 200 and method GET
+[2026-04-30 11:30:05] [INFO] verifyBackendValidationErrorsAreHidden - Backend Error Message is hidden
+[2026-04-30 11:30:05] [INFO] Assertion Passed - Customer signup is successful
