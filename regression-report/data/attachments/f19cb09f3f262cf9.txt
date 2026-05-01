@@ -1,0 +1,20 @@
+[2026-05-01 07:34:50] [INFO] Starting: verifyLastNameInputValidation()
+[2026-05-01 07:34:50] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-01 07:34:50] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-01 07:34:50] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-01 07:34:50] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-01 07:35:10] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-01 07:35:13] [INFO] verifyNavigationToCustomerSignupPage - Successfully hovered over Signup
+[2026-05-01 07:35:15] [INFO] verifyNavigationToCustomerSignupPage - Successfully JS-clicked Customer Signup
+[2026-05-01 07:35:16] [INFO] verifyNavigationToCustomerSignupPage - Customer Signup Page matched with status 200 and method GET
+[2026-05-01 07:35:17] [INFO] verifyNavigationToCustomerSignupPage - Agent Registration Header is hidden
+[2026-05-01 07:35:17] [INFO] Customer Signup Page is opened successfully
+[2026-05-01 07:35:21] [INFO] fillFirstNameInput - Successfully filled First Name with value: Marco
+[2026-05-01 07:35:22] [INFO] fillEmailInput - Successfully filled Email with value: ********************
+[2026-05-01 07:35:22] [INFO] fillPasswordInput - Successfully filled Password with value: ***********
+[2026-05-01 07:35:22] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: *********
+[2026-05-01 07:35:22] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-01 07:35:22] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-01 07:35:23] [INFO] getValidationMessage - Native validation message found for field: last_name
+[2026-05-01 07:35:23] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-05-01 07:35:23] [INFO] Assertion Passed - Last name input validation is successful

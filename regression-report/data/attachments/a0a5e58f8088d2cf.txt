@@ -1,0 +1,9 @@
+[2026-05-01 07:34:14] [INFO] Starting: verifyNavigationToRefundPolicyPage()
+[2026-05-01 07:34:14] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-01 07:34:14] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-01 07:34:14] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-01 07:34:14] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-01 07:34:32] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-01 07:34:35] [INFO] verifyNavigationToRefundPolicyPage - Successfully JS-clicked Refund Policy Navigation Link
+[2026-05-01 07:34:35] [INFO] verifyNavigationToRefundPolicyPage - Refund Policy Page matched with status 200 and method GET
+[2026-05-01 07:34:35] [INFO] Assertion Passed - Navigation to refund policy page is successful
