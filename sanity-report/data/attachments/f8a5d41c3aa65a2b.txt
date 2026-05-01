@@ -1,0 +1,30 @@
+[2026-05-01 11:52:30] [INFO] Starting: verifySuccessfulAgentSignup()
+[2026-05-01 11:52:30] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-01 11:52:31] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-01 11:52:31] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-01 11:52:31] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-01 11:52:57] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-01 11:52:58] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-05-01 11:52:59] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-05-01 11:53:00] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-01 11:53:06] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-05-01 11:53:06] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-01 11:53:08] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-05-01 11:53:08] [INFO] Agent Signup Page is opened successfully
+[2026-05-01 11:53:09] [INFO] extractSecurityCheckQuestion - Successfully retrieved text from Security Check Question
+[2026-05-01 11:53:09] [INFO] Security check question is: 
+                Security Check: What is one plus eighteen? *
+            
+[2026-05-01 11:53:09] [INFO] Security question solved: 1 add 18 = 19
+[2026-05-01 11:53:09] [INFO] Security check answer is: 19
+[2026-05-01 11:53:09] [INFO] fillFirstNameInput - Successfully filled First Name with value: Dana
+[2026-05-01 11:53:10] [INFO] fillLastNameInput - Successfully filled Last Name with value: Schamberger
+[2026-05-01 11:53:10] [INFO] fillEmailInput - Successfully filled Email with value: ***********************
+[2026-05-01 11:53:10] [INFO] fillPasswordInput - Successfully filled Password with value: **********
+[2026-05-01 11:53:10] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: **********
+[2026-05-01 11:53:10] [INFO] fillSecurityCheckAnswerInput - Successfully filled Security Check Answer with value: 19
+[2026-05-01 11:53:10] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-01 11:53:10] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-01 11:53:11] [INFO] fillTheSignUpForm - Create Account matched with status 200 and method GET
+[2026-05-01 11:53:12] [INFO] verifyBackendValidationErrorsAreHidden - Backend Error Message is hidden
+[2026-05-01 11:53:12] [INFO] Assertion Passed - Agent signup is successful
