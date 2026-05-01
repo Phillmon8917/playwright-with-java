@@ -1,0 +1,22 @@
+[2026-05-01 06:40:37] [INFO] Starting: verifyEmailInputValidation()
+[2026-05-01 06:40:37] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-01 06:40:37] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-01 06:40:37] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-01 06:40:37] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-01 06:40:54] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-01 06:40:55] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-05-01 06:40:56] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-05-01 06:40:57] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-01 06:41:00] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-05-01 06:41:00] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-01 06:41:01] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-05-01 06:41:01] [INFO] Agent Signup Page is opened successfully
+[2026-05-01 06:41:02] [INFO] fillFirstNameInput - Successfully filled First Name with value: Letty
+[2026-05-01 06:41:02] [INFO] fillLastNameInput - Successfully filled Last Name with value: Wintheiser
+[2026-05-01 06:41:04] [INFO] fillPasswordInput - Successfully filled Password with value: *********
+[2026-05-01 06:41:04] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: **********
+[2026-05-01 06:41:04] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-01 06:41:04] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-01 06:41:04] [INFO] getValidationMessage - Native validation message found for field: email
+[2026-05-01 06:41:04] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-05-01 06:41:04] [INFO] Assertion Passed - Email input validation is successful
