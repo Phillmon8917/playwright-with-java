@@ -1,0 +1,14 @@
+[2026-05-02 07:08:20] [INFO] Starting: verifyNavigationToAgentSignupPage()
+[2026-05-02 07:08:20] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-02 07:08:20] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-02 07:08:20] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-02 07:08:20] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-02 07:08:36] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-02 07:08:37] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-05-02 07:08:38] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-05-02 07:08:38] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-02 07:08:40] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-05-02 07:08:41] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-02 07:08:42] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-05-02 07:08:42] [INFO] Agent Signup Page is opened successfully
+[2026-05-02 07:08:42] [INFO] Assertion Passed - Navigation to agent signup page is successful

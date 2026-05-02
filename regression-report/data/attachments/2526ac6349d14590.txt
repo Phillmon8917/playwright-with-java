@@ -1,0 +1,23 @@
+[2026-05-02 07:07:06] [INFO] Starting: verifyEmailInputValidation()
+[2026-05-02 07:07:06] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-02 07:07:07] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-02 07:07:07] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-02 07:07:07] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-02 07:07:26] [INFO] [ENV] Found in .env → CI
+[2026-05-02 07:07:27] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-02 07:07:29] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-05-02 07:07:30] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-05-02 07:07:30] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-02 07:07:34] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-05-02 07:07:35] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-02 07:07:37] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-05-02 07:07:37] [INFO] Agent Signup Page is opened successfully
+[2026-05-02 07:07:39] [INFO] fillFirstNameInput - Successfully filled First Name with value: Millard
+[2026-05-02 07:07:42] [INFO] fillLastNameInput - Successfully filled Last Name with value: Gleichner
+[2026-05-02 07:07:42] [INFO] fillPasswordInput - Successfully filled Password with value: ********
+[2026-05-02 07:07:43] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: *********
+[2026-05-02 07:07:43] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-02 07:07:44] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-02 07:07:44] [INFO] getValidationMessage - Native validation message found for field: email
+[2026-05-02 07:07:44] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-05-02 07:07:44] [INFO] Assertion Passed - Email input validation is successful

@@ -1,0 +1,11 @@
+[2026-05-02 07:07:20] [INFO] Starting: verifyCurrencyChange()
+[2026-05-02 07:07:20] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-02 07:07:20] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-02 07:07:20] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-02 07:07:20] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-02 07:07:36] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-02 07:07:36] [INFO] verifyCurrencyChange - Successfully clicked Currency
+[2026-05-02 07:07:38] [INFO] verifyCurrencyChange - Successfully JS-clicked NGN
+[2026-05-02 07:07:39] [INFO] verifyCurrencyChange - Currency Button text assertion passed: NGN
+[2026-05-02 07:07:39] [INFO] Currency is changed to NGN
+[2026-05-02 07:07:39] [INFO] Assertion Passed - Currency change is successful
