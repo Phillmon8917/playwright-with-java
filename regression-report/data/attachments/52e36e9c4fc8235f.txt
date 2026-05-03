@@ -1,0 +1,9 @@
+[2026-05-03 07:28:29] [INFO] Starting: verifyNavigationToBestTravelDealsPage()
+[2026-05-03 07:28:29] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-03 07:28:29] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-03 07:28:29] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-03 07:28:29] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-03 07:28:40] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-03 07:28:41] [INFO] verifyNavigationToBestTravelDealsPage - Successfully JS-clicked Best Travel Deals Navigation Link
+[2026-05-03 07:28:41] [INFO] verifyNavigationToBestTravelDealsPage - Best Travel Deals Page matched with status 200 and method GET
+[2026-05-03 07:28:41] [INFO] Assertion Passed - Navigation to best travel deals page is successful
