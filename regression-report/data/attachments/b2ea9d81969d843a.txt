@@ -1,0 +1,9 @@
+[2026-05-03 06:27:20] [INFO] Starting: verifyNavigationToAccessibilityPage()
+[2026-05-03 06:27:20] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-03 06:27:21] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-03 06:27:21] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-03 06:27:21] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-03 06:27:39] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-03 06:27:42] [INFO] verifyNavigationToAccessibilityPage - Successfully JS-clicked Accessibility Navigation Link
+[2026-05-03 06:27:42] [INFO] verifyNavigationToAccessibilityPage - Accessibility Page matched with status 200 and method GET
+[2026-05-03 06:27:42] [INFO] Assertion Passed - Navigation to accessibility page is successful
