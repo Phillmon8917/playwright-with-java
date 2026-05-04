@@ -1,0 +1,12 @@
+[2026-05-04 06:38:44] [INFO] Starting: verifyNavigationToCookiesPolicyPage()
+[2026-05-04 06:38:44] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-04 06:38:44] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-04 06:38:44] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-04 06:38:44] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-04 06:39:03] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-04 06:39:06] [INFO] verifyNavigationToCookiesPolicyPage - Successfully hovered over Company
+[2026-05-04 06:39:07] [INFO] verifyNavigationToCookiesPolicyPage - Successfully clicked Cookies Policy
+[2026-05-04 06:39:07] [INFO] verifyNavigationToCookiesPolicyPage - Cookies Policy Page matched with status 200 and method GET
+[2026-05-04 06:39:08] [INFO] verifyNavigationToCookiesPolicyPage - Cookies Policy Header is visible
+[2026-05-04 06:39:08] [INFO] Cookies Policy Page is opened successfully
+[2026-05-04 06:39:08] [INFO] Assertion Passed - Navigation to cookies policy page is successful

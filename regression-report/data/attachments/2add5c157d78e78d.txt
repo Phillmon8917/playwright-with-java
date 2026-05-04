@@ -1,0 +1,12 @@
+[2026-05-04 06:37:08] [INFO] Starting: verifyNavigationToTermsOfUsePage()
+[2026-05-04 06:37:08] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-04 06:37:08] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-04 06:37:08] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-04 06:37:08] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-04 06:37:26] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-04 06:37:29] [INFO] verifyNavigationToTermsOfUsePage - Successfully hovered over Company
+[2026-05-04 06:37:30] [INFO] verifyNavigationToTermsOfUsePage - Successfully clicked Terms Of Use
+[2026-05-04 06:37:30] [INFO] verifyNavigationToTermsOfUsePage - Terms Of Use Page matched with status 200 and method GET
+[2026-05-04 06:37:31] [INFO] verifyNavigationToTermsOfUsePage - Terms Of Use Header is visible
+[2026-05-04 06:37:31] [INFO] Terms Of Use Page is opened successfully
+[2026-05-04 06:37:31] [INFO] Assertion Passed - Navigation to terms of use page is successful
