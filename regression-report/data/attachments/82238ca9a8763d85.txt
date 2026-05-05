@@ -1,0 +1,12 @@
+[2026-05-05 06:16:12] [INFO] Starting: verifyNavigationToBecomeASupplierPage()
+[2026-05-05 06:16:12] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-05 06:16:12] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-05 06:16:12] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-05 06:16:12] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-05 06:16:32] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-05 06:16:33] [INFO] verifyNavigationToBecomeASupplierPage - Successfully hovered over Company
+[2026-05-05 06:16:34] [INFO] verifyNavigationToBecomeASupplierPage - Successfully clicked Become A Supplier
+[2026-05-05 06:16:34] [INFO] verifyNavigationToBecomeASupplierPage - Become A Supplier Page matched with status 200 and method GET
+[2026-05-05 06:16:36] [INFO] verifyNavigationToBecomeASupplierPage - Become A Supplier Header is visible
+[2026-05-05 06:16:36] [INFO] Become A Supplier Page is opened successfully
+[2026-05-05 06:16:36] [INFO] Assertion Passed - Navigation to become a supplier page is successful

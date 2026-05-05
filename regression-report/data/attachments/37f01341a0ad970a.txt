@@ -1,0 +1,22 @@
+[2026-05-05 06:13:04] [INFO] Starting: verifyPasswordInputValidation()
+[2026-05-05 06:13:04] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-05 06:13:04] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-05 06:13:04] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-05 06:13:04] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-05 06:13:12] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-05 06:13:12] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-05-05 06:13:13] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-05-05 06:13:13] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-05 06:13:14] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-05-05 06:13:14] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-05 06:13:15] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-05-05 06:13:15] [INFO] Agent Signup Page is opened successfully
+[2026-05-05 06:13:15] [INFO] fillFirstNameInput - Successfully filled First Name with value: Kiersten
+[2026-05-05 06:13:15] [INFO] fillLastNameInput - Successfully filled Last Name with value: Rempel
+[2026-05-05 06:13:15] [INFO] fillEmailInput - Successfully filled Email with value: ***********************
+[2026-05-05 06:13:15] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: ********
+[2026-05-05 06:13:16] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-05 06:13:16] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-05 06:13:16] [INFO] getValidationMessage - Native validation message found for field: password
+[2026-05-05 06:13:16] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-05-05 06:13:16] [INFO] Assertion Passed - Password input validation is successful
