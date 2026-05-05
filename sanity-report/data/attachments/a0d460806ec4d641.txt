@@ -1,0 +1,21 @@
+[2026-05-05 11:55:56] [INFO] Starting: verifyFirstNameInputValidation()
+[2026-05-05 11:55:56] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-05 11:55:56] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-05 11:55:56] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-05 11:55:56] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-05 11:56:17] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-05 11:56:19] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-05-05 11:56:20] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-05-05 11:56:20] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-05 11:56:23] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-05-05 11:56:24] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-05 11:56:25] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-05-05 11:56:25] [INFO] Agent Signup Page is opened successfully
+[2026-05-05 11:56:26] [INFO] fillLastNameInput - Successfully filled Last Name with value: Murray
+[2026-05-05 11:56:27] [INFO] fillEmailInput - Successfully filled Email with value: ************************
+[2026-05-05 11:56:27] [INFO] fillPasswordInput - Successfully filled Password with value: ***********
+[2026-05-05 11:56:28] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: ***********
+[2026-05-05 11:56:28] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-05 11:56:29] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-05 11:56:29] [INFO] getValidationMessage - No validation message found for field: first_name
+[2026-05-05 11:56:29] [ERROR] fillTheSignUpForm - Validation Message assertion failed: Validation Message is null or empty
