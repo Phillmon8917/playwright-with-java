@@ -1,0 +1,11 @@
+[2026-05-05 07:27:40] [INFO] Starting: verifyNavigationToBlogsPage()
+[2026-05-05 07:27:40] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-05 07:27:41] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-05 07:27:41] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-05 07:27:41] [INFO] [ENV] Found in .env → TEST_TIMEOUT
+[2026-05-05 07:27:59] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-05 07:28:01] [INFO] verifyNavigationToBlogsPage - Successfully JS-clicked Blogs
+[2026-05-05 07:28:01] [INFO] verifyNavigationToBlogsPage - Blogs Page matched with status 302 and method GET
+[2026-05-05 07:28:03] [INFO] verifyNavigationToBlogsPage - Blogs Header is visible
+[2026-05-05 07:28:03] [INFO] Blogs Page is opened successfully
+[2026-05-05 07:28:03] [INFO] Assertion Passed - Navigation to blogs page is successful
