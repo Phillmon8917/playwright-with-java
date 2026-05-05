@@ -11,21 +11,21 @@ A comprehensive end-to-end automation testing framework built with **Playwright 
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
 - [Technology Stack](#technology-stack)
-- [Setup & Installation](#setup--installation)
+- [Setup & Installation](#setup-installation)
 - [Running Tests](#running-tests)
-- [Test Tags & Categorization](#test-tags--categorization)
+- [Test Tags & Categorization](#test-tags-categorization)
 - [Project Modules](#project-modules)
 - [Reporting](#reporting)
 
 ---
 
-## 🎯 Overview
+## <a name="overview"></a> 🎯 Overview
 
 This project is a **modular, enterprise-grade test automation framework** designed for testing complex web applications. It leverages Playwright's cross-browser capabilities with Java for type-safe, maintainable test code. The framework supports multiple user roles (admin, agent, customer, guest), provides persistent authentication state management, and includes comprehensive reporting and logging.
 
 ---
 
-## ✨ Key Features
+## <a name="key-features"></a> ✨ Key Features
 
 - **Cross-Browser Testing**: Chrome, Firefox, and WebKit support via Playwright
 - **Role-Based Test Execution**: Built-in support for multiple user roles with persistent session storage
@@ -43,7 +43,7 @@ This project is a **modular, enterprise-grade test automation framework** design
 
 ---
 
-## 🏗️ Architecture
+## <a name="architecture"></a> 🏗️ Architecture
 
 The framework follows a **layered architecture** with clear separation of concerns:
 
@@ -76,7 +76,7 @@ The framework follows a **layered architecture** with clear separation of concer
 
 ---
 
-## 📁 Project Structure
+## <a name="project-structure"></a> 📁 Project Structure
 
 ```
 src/
@@ -137,7 +137,7 @@ target/
 
 ---
 
-## 🛠️ Technology Stack
+## <a name="technology-stack"></a> 🛠️ Technology Stack
 
 | Component | Version |
 |-----------|---------|
@@ -155,7 +155,7 @@ target/
 
 ---
 
-## 📦 Setup & Installation
+## <a name="setup-installation"></a> 📦 Setup & Installation
 
 ### Prerequisites
 - **Java 21** or higher
@@ -199,7 +199,7 @@ target/
 
 ---
 
-## 🧪 Running Tests
+## <a name="running-tests"></a> 🧪 Running Tests
 
 ### Run All Tests
 ```bash
@@ -239,7 +239,7 @@ mvn clean test -DthreadCount=4
 
 ---
 
-## 🏷️ Test Tags & Categorization
+## <a name="test-tags-categorization"></a> 🏷️ Test Tags & Categorization
 
 Test tags are defined in `TestTags.java` and provide classification for test organization and filtering:
 
@@ -281,7 +281,7 @@ class AdminAuthTest extends BaseTest {
 
 ---
 
-## 📦 Project Modules
+## <a name="project-modules"></a> 📦 Project Modules
 
 ### **Config Module** (`config/`)
 Manages browser configuration, context creation, and timeout settings.
@@ -326,7 +326,7 @@ Helper utilities for common tasks:
 
 ---
 
-## 📊 Reporting
+## <a name="reporting"></a> 📊 Reporting
 
 ### Allure Integration
 
