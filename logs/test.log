@@ -1,24 +1,19 @@
-[2026-04-25 13:13:17] [WARN] [ENV] Missing key → CI
-[2026-04-25 13:13:17] [INFO] Starting: adminLoginTest()
-[2026-04-25 13:13:17] [INFO] [ENV] Found in .env → BASE_URL
-[2026-04-25 13:13:17] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
-[2026-04-25 13:13:17] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
-[2026-04-25 13:13:18] [INFO] Deleted storage state for: admin
-[2026-04-25 13:13:18] [INFO] [ENV] Found in .env → TEST_TIMEOUT
-[2026-04-25 13:13:31] [WARN] [ENV] Missing key → CI
-[2026-04-25 13:13:32] [INFO] loadThePage - Loader disappeared (hidden or detached)
-[2026-04-25 13:13:32] [INFO] verifyNavigationToLoginPage - Successfully JS-clicked Login
-[2026-04-25 13:13:33] [INFO] verifyNavigationToLoginPage - Login Page matched with status 200 and method GET
-[2026-04-25 13:13:35] [INFO] verifyNavigationToLoginPage - Loader disappeared (hidden or detached)
-[2026-04-25 13:13:35] [INFO] verifyNavigationToLoginPage - Sign In To Your Account Button is visible
-[2026-04-25 13:13:35] [INFO] Login Page is opened successfully
-[2026-04-25 13:13:35] [INFO] [ENV] Found in .env → ADMIN_USERNAME
-[2026-04-25 13:13:35] [INFO] [ENV] Found in .env → ADMIN_PASSWORD
-[2026-04-25 13:13:35] [INFO] fillEmailInput - Successfully filled Email with value: ********************
-[2026-04-25 13:13:35] [INFO] fillPasswordInput - Successfully filled Password with value: *********
-[2026-04-25 13:13:35] [INFO] toggleRememberMe - Successfully JS-clicked Toggle Remember Me
-[2026-04-25 13:13:35] [INFO] clickLoginButton - Successfully JS-clicked Login
-[2026-04-25 13:13:36] [INFO] login - Loader was not present, continuing
-[2026-04-25 13:13:36] [INFO] verifySuccessfulLogin - Dashboard Header is visible
-[2026-04-25 13:13:36] [INFO] Login successful
-[2026-04-25 13:13:36] [INFO] Admin login test passed + storage state saved
+[2026-05-05 12:13:51] [INFO] Starting scenario: All quick search tabs are visible
+[2026-05-05 12:14:05] [WARN] [ENV] Missing key → CI
+[2026-05-05 12:14:06] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-05 12:14:06] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-05 12:14:06] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-05 12:14:19] [WARN] [ENV] Missing key → CI
+[2026-05-05 12:14:19] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-05 12:14:20] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Visa Quick Search Tab
+[2026-05-05 12:14:20] [INFO] verifyAllQuickSearchTabsAreVisible - Check Visa Search Button is visible
+[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Tours Quick Search Tab
+[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Tours Search Button is visible
+[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Cars Quick Search Tab
+[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Cars Search Button is visible
+[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Flights Quick Search Tab
+[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Flights Search Button is visible
+[2026-05-05 12:14:22] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Stays Quick Search Tab
+[2026-05-05 12:14:22] [INFO] verifyAllQuickSearchTabsAreVisible - Stays Search Button is visible
+[2026-05-05 12:14:22] [INFO] Assertion Passed - All quick search tabs are visible
+[2026-05-05 12:14:24] [INFO] Scenario finished: All quick search tabs are visible | Status: PASSED

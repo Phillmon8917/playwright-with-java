@@ -1,17 +1,25 @@
 package base;
 
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+
 import config.PlaywrightConfig;
 import extensions.DynamicTimeoutExtension;
 import extensions.FailureTracker;
 import extensions.ReportingExtension;
-import com.microsoft.playwright.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
 import utils.logger.AllureLogAppender;
 import utils.logger.LoggingUtil;
 import utils.storage.StorageStateManager;
-
-import java.nio.file.Path;
 
 @ExtendWith({DynamicTimeoutExtension.class, ReportingExtension.class})
 public abstract class BaseTest {
@@ -25,16 +33,19 @@ public abstract class BaseTest {
     private long testThreadId;
 
     /**
-     * Returns the storage role whose saved authentication state should be loaded for the test.
+     * Returns the storage role whose saved authentication state should be
+     * loaded for the test.
      *
-     * @return the storage role name, or {@code null} when no stored state should be used
+     * @return the storage role name, or {@code null} when no stored state
+     * should be used
      */
     protected String storageRole() {
         return null;
     }
 
     /**
-     * Creates the Playwright context and page for the current test and initializes page objects.
+     * Creates the Playwright context and page for the current test and
+     * initializes page objects.
      *
      * @param testInfo metadata about the test being executed
      * @throws Exception if the browser context or page cannot be created
@@ -69,7 +80,8 @@ public abstract class BaseTest {
     }
 
     /**
-     * Cleans up the Playwright context, attachments, and failure tracking after each test execution.
+     * Cleans up the Playwright context, attachments, and failure tracking after
+     * each test execution.
      *
      * @param testInfo metadata about the test that completed
      * @throws Exception if test artifacts cannot be finalized correctly
@@ -88,7 +100,8 @@ public abstract class BaseTest {
     }
 
     /**
-     * Closes the shared browser and Playwright instances after all tests in the class have run.
+     * Closes the shared browser and Playwright instances after all tests in the
+     * class have run.
      */
     @AfterAll
     static void closeBrowser() {
@@ -106,9 +119,11 @@ public abstract class BaseTest {
     }
 
     /**
-     * Initializes page object instances after the Playwright page has been created.
+     * Initializes page object instances after the Playwright page has been
+     * created.
      */
-    protected void initPages() {}
+    protected void initPages() {
+    }
 
     /**
      * Returns the browser instance associated with the current test thread.
