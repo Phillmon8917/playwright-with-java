@@ -1,0 +1,8 @@
+[2026-05-06 07:43:31] [INFO] Starting scenario: Navigate to disruptions page
+[2026-05-06 07:43:32] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 07:43:32] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 07:43:32] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 07:43:49] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 07:43:50] [INFO] verifyNavigationToDisruptionsPage - Successfully JS-clicked Disruptions Navigation Link
+[2026-05-06 07:43:50] [INFO] verifyNavigationToDisruptionsPage - Disruptions Page matched with status 200 and method GET
+[2026-05-06 07:43:50] [INFO] Assertion Passed - Navigation to disruptions page is successful

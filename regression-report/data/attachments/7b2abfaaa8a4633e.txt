@@ -1,0 +1,22 @@
+[2026-05-06 07:42:34] [INFO] Starting scenario: First name field validation on agent signup
+[2026-05-06 07:42:35] [INFO] [ENV] Found in .env → CI
+[2026-05-06 07:42:36] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 07:42:36] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 07:42:36] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 07:42:50] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 07:42:50] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-05-06 07:42:52] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-05-06 07:42:52] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-06 07:42:55] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-05-06 07:42:56] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-06 07:42:57] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-05-06 07:42:57] [INFO] Agent Signup Page is opened successfully
+[2026-05-06 07:42:59] [INFO] fillLastNameInput - Successfully filled Last Name with value: Christiansen
+[2026-05-06 07:42:59] [INFO] fillEmailInput - Successfully filled Email with value: ************************
+[2026-05-06 07:42:59] [INFO] fillPasswordInput - Successfully filled Password with value: *********
+[2026-05-06 07:42:59] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: ********
+[2026-05-06 07:42:59] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-06 07:42:59] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-06 07:42:59] [INFO] getValidationMessage - Native validation message found for field: first_name
+[2026-05-06 07:42:59] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-05-06 07:42:59] [INFO] Assertion Passed - First name input validation is successful

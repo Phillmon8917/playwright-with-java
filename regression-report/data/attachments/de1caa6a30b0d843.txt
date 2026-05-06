@@ -1,0 +1,8 @@
+[2026-05-06 07:45:29] [INFO] Starting scenario: Navigate to how to book page
+[2026-05-06 07:45:29] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 07:45:29] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 07:45:29] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 07:45:42] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 07:45:45] [INFO] verifyNavigationToHowToBookPage - Successfully JS-clicked How To Book Navigation Link
+[2026-05-06 07:45:45] [INFO] verifyNavigationToHowToBookPage - How To Book Page matched with status 200 and method GET
+[2026-05-06 07:45:45] [INFO] Assertion Passed - Navigation to how to book page is successful

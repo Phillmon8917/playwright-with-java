@@ -1,0 +1,9 @@
+[2026-05-06 07:43:31] [INFO] Starting scenario: Navigate to cars booking page
+[2026-05-06 07:43:31] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 07:43:31] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 07:43:31] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 07:43:45] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 07:43:46] [INFO] verifyNavigationToCarsBooking - Successfully hovered over Services
+[2026-05-06 07:43:47] [INFO] verifyNavigationToCarsBooking - Successfully clicked Cars
+[2026-05-06 07:43:47] [INFO] verifyNavigationToCarsBooking - Cars Page matched with status 200 and method GET
+[2026-05-06 07:43:47] [INFO] Assertion Passed - Navigation to cars booking page is successful

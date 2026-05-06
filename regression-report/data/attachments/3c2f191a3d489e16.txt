@@ -1,0 +1,13 @@
+[2026-05-06 07:42:54] [INFO] Starting scenario: Header navigation links are present
+[2026-05-06 07:42:55] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 07:42:55] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 07:42:55] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 07:43:10] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 07:43:11] [INFO] verifyThatHeaderNavLinksAreVisible - Services is visible
+[2026-05-06 07:43:11] [INFO] verifyThatHeaderNavLinksAreVisible - Company is visible
+[2026-05-06 07:43:11] [INFO] verifyThatHeaderNavLinksAreVisible - Blogs is visible
+[2026-05-06 07:43:11] [INFO] verifyThatHeaderNavLinksAreVisible - Language is visible
+[2026-05-06 07:43:11] [INFO] verifyThatHeaderNavLinksAreVisible - Currency is visible
+[2026-05-06 07:43:11] [INFO] verifyThatHeaderNavLinksAreVisible - Login is visible
+[2026-05-06 07:43:11] [INFO] verifyThatHeaderNavLinksAreVisible - Signup is visible
+[2026-05-06 07:43:11] [INFO] Assertion Passed - Header navigation links are present

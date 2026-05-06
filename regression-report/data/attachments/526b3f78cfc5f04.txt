@@ -1,0 +1,11 @@
+[2026-05-06 07:45:26] [INFO] Starting scenario: Navigate to login page
+[2026-05-06 07:45:26] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 07:45:26] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 07:45:26] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 07:45:41] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 07:45:43] [INFO] verifyNavigationToLoginPage - Successfully JS-clicked Login
+[2026-05-06 07:45:43] [INFO] verifyNavigationToLoginPage - Login Page matched with status 200 and method GET
+[2026-05-06 07:45:43] [INFO] verifyNavigationToLoginPage - Loader was not present, continuing
+[2026-05-06 07:45:44] [INFO] verifyNavigationToLoginPage - Sign In To Your Account Button is visible
+[2026-05-06 07:45:44] [INFO] Login Page is opened successfully
+[2026-05-06 07:45:44] [INFO] Assertion Passed - Navigation to login page is successful

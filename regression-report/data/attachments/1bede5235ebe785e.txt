@@ -1,0 +1,8 @@
+[2026-05-06 07:44:12] [INFO] Starting scenario: Navigate to travel documents page
+[2026-05-06 07:44:12] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 07:44:12] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 07:44:12] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 07:44:26] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 07:44:28] [INFO] verifyNavigationToTravelDocumentsPage - Successfully JS-clicked Travel Documents Navigation Link
+[2026-05-06 07:44:28] [INFO] verifyNavigationToTravelDocumentsPage - Travel Documents Page matched with status 200 and method GET
+[2026-05-06 07:44:28] [INFO] Assertion Passed - Navigation to travel documents page is successful
