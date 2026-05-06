@@ -1,0 +1,10 @@
+[2026-05-06 12:24:12] [INFO] Starting scenario: Change language to Russian
+[2026-05-06 12:24:12] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 12:24:12] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 12:24:12] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 12:24:26] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 12:24:26] [INFO] verifyLanguageChange - Successfully clicked Language
+[2026-05-06 12:24:27] [INFO] verifyLanguageChange - Successfully JS-clicked Russian
+[2026-05-06 12:24:29] [INFO] verifyLanguageChange - Language Button text assertion passed: Russian
+[2026-05-06 12:24:29] [INFO] Language is changed to Russian
+[2026-05-06 12:24:29] [INFO] Assertion Passed - Language change is successful

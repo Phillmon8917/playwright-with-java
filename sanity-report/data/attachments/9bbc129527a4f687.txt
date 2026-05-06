@@ -1,0 +1,27 @@
+[2026-05-06 12:24:07] [INFO] Starting scenario: Successful customer signup
+[2026-05-06 12:24:07] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 12:24:07] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 12:24:07] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 12:24:23] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 12:24:24] [INFO] verifyNavigationToCustomerSignupPage - Successfully hovered over Signup
+[2026-05-06 12:24:25] [INFO] verifyNavigationToCustomerSignupPage - Successfully JS-clicked Customer Signup
+[2026-05-06 12:24:25] [INFO] verifyNavigationToCustomerSignupPage - Customer Signup Page matched with status 200 and method GET
+[2026-05-06 12:24:26] [INFO] verifyNavigationToCustomerSignupPage - Agent Registration Header is hidden
+[2026-05-06 12:24:26] [INFO] Customer Signup Page is opened successfully
+[2026-05-06 12:24:26] [INFO] extractSecurityCheckQuestion - Successfully retrieved text from Security Check Question
+[2026-05-06 12:24:26] [INFO] Security check question is: 
+                Security Check: What is 11 + 5? *
+            
+[2026-05-06 12:24:26] [INFO] Security question solved: 11 add 5 = 16
+[2026-05-06 12:24:26] [INFO] Security check answer is: 16
+[2026-05-06 12:24:27] [INFO] fillFirstNameInput - Successfully filled First Name with value: Darwin
+[2026-05-06 12:24:28] [INFO] fillLastNameInput - Successfully filled Last Name with value: Gaylord
+[2026-05-06 12:24:28] [INFO] fillEmailInput - Successfully filled Email with value: ***************************
+[2026-05-06 12:24:28] [INFO] fillPasswordInput - Successfully filled Password with value: **********
+[2026-05-06 12:24:28] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: **********
+[2026-05-06 12:24:29] [INFO] fillSecurityCheckAnswerInput - Successfully filled Security Check Answer with value: 16
+[2026-05-06 12:24:29] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-06 12:24:29] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-06 12:24:29] [INFO] fillTheSignUpForm - Create Account matched with status 200 and method GET
+[2026-05-06 12:24:30] [INFO] verifyBackendValidationErrorsAreHidden - Backend Error Message is hidden
+[2026-05-06 12:24:30] [INFO] Assertion Passed - Signup is successful

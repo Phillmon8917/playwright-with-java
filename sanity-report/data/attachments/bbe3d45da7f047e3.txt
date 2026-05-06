@@ -1,0 +1,7 @@
+[2026-05-06 12:24:33] [INFO] Starting scenario: Home page loads successfully
+[2026-05-06 12:24:33] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 12:24:33] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 12:24:33] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 12:24:45] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 12:24:46] [INFO] verifyPageLoaded - Logo is visible
+[2026-05-06 12:24:46] [INFO] Assertion Passed - Home Page is loaded
