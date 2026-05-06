@@ -1,0 +1,8 @@
+[2026-05-06 06:30:50] [INFO] Starting scenario: Navigate to careers page
+[2026-05-06 06:30:50] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 06:30:50] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 06:30:50] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 06:31:06] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 06:31:07] [INFO] verifyNavigationToCareersAndJobsPage - Successfully JS-clicked Careers And Jobs Navigation Link
+[2026-05-06 06:31:07] [INFO] verifyNavigationToCareersAndJobsPage - Careers And Jobs Page matched with status 200 and method GET
+[2026-05-06 06:31:07] [INFO] Assertion Passed - Navigation to careers page is successful

@@ -1,0 +1,19 @@
+[2026-05-06 06:28:27] [INFO] Starting scenario: Password field validation on customer signup
+[2026-05-06 06:28:27] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 06:28:27] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 06:28:27] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 06:28:41] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 06:28:41] [INFO] verifyNavigationToCustomerSignupPage - Successfully hovered over Signup
+[2026-05-06 06:28:42] [INFO] verifyNavigationToCustomerSignupPage - Successfully JS-clicked Customer Signup
+[2026-05-06 06:28:42] [INFO] verifyNavigationToCustomerSignupPage - Customer Signup Page matched with status 200 and method GET
+[2026-05-06 06:28:43] [INFO] verifyNavigationToCustomerSignupPage - Agent Registration Header is hidden
+[2026-05-06 06:28:43] [INFO] Customer Signup Page is opened successfully
+[2026-05-06 06:28:44] [INFO] fillFirstNameInput - Successfully filled First Name with value: Shela
+[2026-05-06 06:28:45] [INFO] fillLastNameInput - Successfully filled Last Name with value: Lockman
+[2026-05-06 06:28:45] [INFO] fillEmailInput - Successfully filled Email with value: ***********************
+[2026-05-06 06:28:46] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: ***********
+[2026-05-06 06:28:46] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-06 06:28:46] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-06 06:28:46] [INFO] getValidationMessage - Native validation message found for field: password
+[2026-05-06 06:28:46] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-05-06 06:28:46] [INFO] Assertion Passed - Password input validation is successful

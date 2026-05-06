@@ -1,0 +1,9 @@
+[2026-05-06 06:28:59] [INFO] Starting scenario: Navigate to stays booking page
+[2026-05-06 06:28:59] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 06:28:59] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 06:28:59] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 06:29:13] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 06:29:13] [INFO] verifyNavigationToStaysBooking - Successfully hovered over Services
+[2026-05-06 06:29:14] [INFO] verifyNavigationToStaysBooking - Successfully clicked Stays
+[2026-05-06 06:29:15] [INFO] verifyNavigationToStaysBooking - Stays Page matched with status 200 and method GET
+[2026-05-06 06:29:15] [INFO] Assertion Passed - Navigation to stays booking page is successful

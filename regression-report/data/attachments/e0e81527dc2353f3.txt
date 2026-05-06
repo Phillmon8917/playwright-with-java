@@ -1,0 +1,21 @@
+[2026-05-06 06:29:10] [INFO] Starting scenario: Last name field validation on agent signup
+[2026-05-06 06:29:10] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-06 06:29:10] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-06 06:29:10] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-06 06:29:25] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-06 06:29:26] [INFO] verifyNavigationToAgentSignupPage - Successfully hovered over Signup
+[2026-05-06 06:29:27] [INFO] verifyNavigationToAgentSignupPage - Successfully clicked Agent Signup
+[2026-05-06 06:29:27] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-06 06:29:28] [INFO] verifyNavigationToAgentSignupPage - Successfully JS-clicked Agent Signup Link
+[2026-05-06 06:29:28] [INFO] verifyNavigationToAgentSignupPage - Agent Signup Page matched with status 200 and method GET
+[2026-05-06 06:29:30] [INFO] verifyNavigationToAgentSignupPage - Agent Registration Header is visible
+[2026-05-06 06:29:30] [INFO] Agent Signup Page is opened successfully
+[2026-05-06 06:29:31] [INFO] fillFirstNameInput - Successfully filled First Name with value: Gino
+[2026-05-06 06:29:32] [INFO] fillEmailInput - Successfully filled Email with value: ***********************
+[2026-05-06 06:29:32] [INFO] fillPasswordInput - Successfully filled Password with value: *********
+[2026-05-06 06:29:32] [INFO] fillConfirmPasswordInput - Successfully filled Confirm Password with value: ***********
+[2026-05-06 06:29:33] [INFO] agreeToTerms - Successfully JS-clicked Agree to Terms
+[2026-05-06 06:29:33] [INFO] clickCreateAccountButton - Successfully JS-clicked Create Account
+[2026-05-06 06:29:33] [INFO] getValidationMessage - Native validation message found for field: last_name
+[2026-05-06 06:29:33] [INFO] fillTheSignUpForm - Validation Message is not null or empty: "Please fill out this field."
+[2026-05-06 06:29:33] [INFO] Assertion Passed - Last name input validation is successful
