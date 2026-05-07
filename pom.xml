@@ -125,11 +125,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <includes>
-                        <include>**/AuthRunner.java</include>
-                        <include>**/CucumberRunner.java</include>
-                    </includes>
-                    <runOrder>alphabetical</runOrder>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>
@@ -141,6 +136,35 @@
                         <junit.jupiter.execution.parallel.config.fixed.parallelism>3</junit.jupiter.execution.parallel.config.fixed.parallelism>
                     </systemPropertyVariables>
                 </configuration>
+                <executions>
+                    <!-- Phase 1: Auth always runs first, no tag filtering -->
+                    <execution>
+                        <id>auth-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/AuthRunner.java</include>
+                            </includes>
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </execution>
+                    <!-- Phase 2: All other tests, respects tag filters -->
+                    <execution>
+                        <id>main-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/CucumberRunner.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
