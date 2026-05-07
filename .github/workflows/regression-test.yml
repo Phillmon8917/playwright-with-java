@@ -8,8 +8,8 @@ permissions:
 
 on:
   schedule:
-    - cron: "0 4 * * *" # 06:00 SAST -> develop
-    - cron: "0 5 * * *" # 07:00 SAST -> qa
+    - cron: "0 4 * * *"
+    - cron: "0 5 * * *"
   workflow_dispatch:
     inputs:
       tag:
@@ -51,10 +51,6 @@ on:
         default: "360000"
 
 jobs:
-  # Resolves which branch to run on.
-  # - Manual: uses the selected branch input
-  # - Scheduled 04:00 UTC (06:00 SAST) -> develop
-  # - Scheduled 05:00 UTC (07:00 SAST) -> qa
   resolve-branch:
     runs-on: ubuntu-latest
     outputs:
@@ -127,6 +123,8 @@ jobs:
       fail-fast: false
       matrix:
         shard: [ 1, 2, 3, 4, 5, 6 ]
+    outputs:
+      shard1_result: ${{ steps.result.outputs.result }}
     env:
       CI: true
       DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
@@ -171,8 +169,56 @@ jobs:
           path: storage/
 
       - name: Run shard ${{ matrix.shard }}
-        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="${{ inputs.tag
-          != '' && inputs.tag || 'regression' }} & shard${{ matrix.shard }}"
+        id: run_tests
+        run: |
+          mvn test -Dsurefire.failIfNoSpecifiedTests=false \
+            -Dgroups="${{ inputs.tag != '' && inputs.tag || 'regression' }} & shard${{ matrix.shard }}" \
+            | tee shard-output.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+
+      - name: Parse shard results
+        if: always()
+        id: parse
+        run: |
+          TESTS=$(grep -oP 'Tests run: \K[0-9]+' shard-output.txt | tail -1 || echo "0")
+          FAILURES=$(grep -oP 'Failures: \K[0-9]+' shard-output.txt | tail -1 || echo "0")
+          ERRORS=$(grep -oP 'Errors: \K[0-9]+' shard-output.txt | tail -1 || echo "0")
+          SKIPPED=$(grep -oP 'Skipped: \K[0-9]+' shard-output.txt | tail -1 || echo "0")
+          PASSED=$((TESTS - FAILURES - ERRORS - SKIPPED))
+          echo "tests=$TESTS" >> $GITHUB_OUTPUT
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failures=$FAILURES" >> $GITHUB_OUTPUT
+          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+
+      - name: Write shard summary
+        if: always()
+        run: |
+          STATUS="${{ steps.run_tests.outputs.exit_code == '0' && '✅ Passed' || '❌ Failed' }}"
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## Shard ${{ matrix.shard }} Summary
+          | Field | Value |
+          |-------|-------|
+          | Status | $STATUS |
+          | Total Tests | ${{ steps.parse.outputs.tests }} |
+          | ✅ Passed | ${{ steps.parse.outputs.passed }} |
+          | ❌ Failed | ${{ steps.parse.outputs.failures }} |
+          | 🔴 Errors | ${{ steps.parse.outputs.errors }} |
+          | ⏭️ Skipped | ${{ steps.parse.outputs.skipped }} |
+          EOF
+
+      - name: Save shard result
+        if: always()
+        run: |
+          echo "${{ matrix.shard }},${{ steps.parse.outputs.tests }},${{ steps.parse.outputs.passed }},${{ steps.parse.outputs.failures }},${{ steps.parse.outputs.errors }},${{ steps.parse.outputs.skipped }}" \
+            > shard-result-${{ matrix.shard }}.txt
+
+      - name: Upload shard result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shard-result-${{ matrix.shard }}
+          path: shard-result-${{ matrix.shard }}.txt
 
       - name: Upload Allure results
         if: always()
@@ -213,6 +259,13 @@ jobs:
           merge-multiple: true
           path: target/allure-results/
 
+      - name: Download all shard results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: shard-result-*
+          merge-multiple: true
+          path: shard-results/
+
       - name: Generate Allure report
         run: mvn allure:report
 
@@ -221,6 +274,83 @@ jobs:
 
       - name: Build monthly report
         run: mvn exec:java -Dexec.mainClass=report.BuildReport
+
+      - name: Write final run summary
+        if: always()
+        run: |
+          BRANCH="${{ needs.resolve-branch.outputs.branch }}"
+          TAG="${{ inputs.tag != '' && inputs.tag || 'regression' }}"
+          RUN_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')
+          TRIGGER="${{ github.event_name }}"
+
+          TOTAL_TESTS=0
+          TOTAL_PASSED=0
+          TOTAL_FAILURES=0
+          TOTAL_ERRORS=0
+          TOTAL_SKIPPED=0
+
+          for f in shard-results/*.txt; do
+            IFS=',' read -r shard tests passed failures errors skipped < "$f"
+            TOTAL_TESTS=$((TOTAL_TESTS + tests))
+            TOTAL_PASSED=$((TOTAL_PASSED + passed))
+            TOTAL_FAILURES=$((TOTAL_FAILURES + failures))
+            TOTAL_ERRORS=$((TOTAL_ERRORS + errors))
+            TOTAL_SKIPPED=$((TOTAL_SKIPPED + skipped))
+          done
+
+          if [ "$TOTAL_FAILURES" -eq 0 ] && [ "$TOTAL_ERRORS" -eq 0 ]; then
+            OVERALL="✅ All Passed"
+          else
+            OVERALL="❌ Some Failed"
+          fi
+
+          PASS_RATE=0
+          if [ "$TOTAL_TESTS" -gt 0 ]; then
+            PASS_RATE=$(echo "scale=1; $TOTAL_PASSED * 100 / $TOTAL_TESTS" | bc)
+          fi
+
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          # 🧪 Regression Run Summary
+
+          | Field | Value |
+          |-------|-------|
+          | 📅 Date | $RUN_DATE |
+          | 🌿 Branch | \`$BRANCH\` |
+          | 🏷️ Test Type | \`$TAG\` |
+          | 🔀 Trigger | \`$TRIGGER\` |
+          | 🌐 Base URL | ${{ env.BASE_URL || vars.BASE_URL }} |
+          | 📊 Overall Status | $OVERALL |
+
+          ## 📈 Results Breakdown
+
+          | Metric | Count |
+          |--------|-------|
+          | Total Tests | $TOTAL_TESTS |
+          | ✅ Passed | $TOTAL_PASSED |
+          | ❌ Failed | $TOTAL_FAILURES |
+          | 🔴 Errors | $TOTAL_ERRORS |
+          | ⏭️ Skipped | $TOTAL_SKIPPED |
+          | 📊 Pass Rate | $PASS_RATE% |
+
+          ## 🗂️ Shard Breakdown
+
+          | Shard | Tests | Passed | Failed | Errors | Skipped |
+          |-------|-------|--------|--------|--------|---------|
+          EOF
+
+          for f in shard-results/*.txt; do
+            IFS=',' read -r shard tests passed failures errors skipped < "$f"
+            echo "| Shard $shard | $tests | $passed | $failures | $errors | $skipped |" >> $GITHUB_STEP_SUMMARY
+          done
+
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+
+          ## 🔗 Reports
+          | Report | Link |
+          |--------|------|
+          | Regression Report | [View](https://Phillmon8917.github.io/phptravels-reports/regression-report/index.html) |
+          | Monthly Report | [View](https://Phillmon8917.github.io/phptravels-reports/monthly-report/index.html) |
+          EOF
 
       - name: Set report date
         run: echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_ENV
