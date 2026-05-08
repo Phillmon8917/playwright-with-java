@@ -178,11 +178,11 @@ jobs:
           ERRORS=$(grep -oP 'Errors: \K[0-9]+' shard-output.txt | tail -1 || echo "0")
           SKIPPED=$(grep -oP 'Skipped: \K[0-9]+' shard-output.txt | tail -1 || echo "0")
           PASSED=$((TESTS - FAILURES - ERRORS - SKIPPED))
-          echo "tests=$TESTS" >> $GITHUB_OUTPUT
-          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "tests=$TESTS"       >> $GITHUB_OUTPUT
+          echo "passed=$PASSED"     >> $GITHUB_OUTPUT
           echo "failures=$FAILURES" >> $GITHUB_OUTPUT
-          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
-          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+          echo "errors=$ERRORS"     >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED"   >> $GITHUB_OUTPUT
 
       - name: Write shard summary
         if: always()
@@ -272,11 +272,7 @@ jobs:
         if: always()
         id: aggregate
         run: |
-          TOTAL_TESTS=0
-          TOTAL_PASSED=0
-          TOTAL_FAILURES=0
-          TOTAL_ERRORS=0
-          TOTAL_SKIPPED=0
+          TOTAL_TESTS=0; TOTAL_PASSED=0; TOTAL_FAILURES=0; TOTAL_ERRORS=0; TOTAL_SKIPPED=0
           for f in shard-results/*.txt; do
             IFS=',' read -r shard tests passed failures errors skipped < "$f"
             TOTAL_TESTS=$((TOTAL_TESTS + tests))
@@ -285,61 +281,68 @@ jobs:
             TOTAL_ERRORS=$((TOTAL_ERRORS + errors))
             TOTAL_SKIPPED=$((TOTAL_SKIPPED + skipped))
           done
-          echo "tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
-          echo "passed=$TOTAL_PASSED" >> $GITHUB_OUTPUT
-          echo "failures=$TOTAL_FAILURES" >> $GITHUB_OUTPUT
-          echo "errors=$TOTAL_ERRORS" >> $GITHUB_OUTPUT
-          echo "skipped=$TOTAL_SKIPPED" >> $GITHUB_OUTPUT
+          echo "tests=$TOTAL_TESTS"         >> $GITHUB_OUTPUT
+          echo "passed=$TOTAL_PASSED"       >> $GITHUB_OUTPUT
+          echo "failures=$TOTAL_FAILURES"   >> $GITHUB_OUTPUT
+          echo "errors=$TOTAL_ERRORS"       >> $GITHUB_OUTPUT
+          echo "skipped=$TOTAL_SKIPPED"     >> $GITHUB_OUTPUT
+
+      - name: Set run metadata
+        if: always()
+        run: |
+          RUN_ID="${{ github.run_id }}"
+          TESTS=${{ steps.aggregate.outputs.tests }}
+          PASSED=${{ steps.aggregate.outputs.passed }}
+          FAILURES=${{ steps.aggregate.outputs.failures }}
+          ERRORS=${{ steps.aggregate.outputs.errors }}
+          SKIPPED=${{ steps.aggregate.outputs.skipped }}
+          PASS_RATE=0
+          [ "$TESTS" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $TESTS" | bc)
+          [ "$FAILURES" -eq 0 ] && [ "$ERRORS" -eq 0 ] && STATUS="passed" || STATUS="failed"
+
+          echo "RUN_ID=$RUN_ID"                                        >> $GITHUB_ENV
+          echo "RUN_DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')"            >> $GITHUB_ENV
+          echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')"         >> $GITHUB_ENV
+          echo "META_BRANCH=${{ needs.resolve-branch.outputs.branch }}" >> $GITHUB_ENV
+          echo "META_TAG=${{ inputs.tag != '' && inputs.tag || 'regression' }}" >> $GITHUB_ENV
+          echo "META_TRIGGER=${{ github.event_name }}"                 >> $GITHUB_ENV
+          echo "META_TESTS=$TESTS"                                     >> $GITHUB_ENV
+          echo "META_PASSED=$PASSED"                                   >> $GITHUB_ENV
+          echo "META_FAILURES=$FAILURES"                               >> $GITHUB_ENV
+          echo "META_ERRORS=$ERRORS"                                   >> $GITHUB_ENV
+          echo "META_SKIPPED=$SKIPPED"                                 >> $GITHUB_ENV
+          echo "META_STATUS=$STATUS"                                   >> $GITHUB_ENV
+          echo "META_PASS_RATE=$PASS_RATE"                             >> $GITHUB_ENV
 
       - name: Write final run summary
         if: always()
         run: |
-          BRANCH="${{ needs.resolve-branch.outputs.branch }}"
-          TAG="${{ inputs.tag != '' && inputs.tag || 'regression' }}"
-          RUN_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')
-          TRIGGER="${{ github.event_name }}"
-          TOTAL_TESTS=${{ steps.aggregate.outputs.tests }}
-          TOTAL_PASSED=${{ steps.aggregate.outputs.passed }}
-          TOTAL_FAILURES=${{ steps.aggregate.outputs.failures }}
-          TOTAL_ERRORS=${{ steps.aggregate.outputs.errors }}
-          TOTAL_SKIPPED=${{ steps.aggregate.outputs.skipped }}
-
-          if [ "$TOTAL_FAILURES" -eq 0 ] && [ "$TOTAL_ERRORS" -eq 0 ]; then
-            OVERALL="✅ All Passed"
-          else
-            OVERALL="❌ Some Failed"
-          fi
-
-          PASS_RATE=0
-          if [ "$TOTAL_TESTS" -gt 0 ]; then
-            PASS_RATE=$(echo "scale=1; $TOTAL_PASSED * 100 / $TOTAL_TESTS" | bc)
-          fi
+          PASS_RATE=${{ env.META_PASS_RATE }}
+          [ "${{ env.META_FAILURES }}" -eq 0 ] && [ "${{ env.META_ERRORS }}" -eq 0 ] \
+            && OVERALL="✅ All Passed" || OVERALL="❌ Some Failed"
 
           cat >> $GITHUB_STEP_SUMMARY << EOF
           # 🧪 Regression Run Summary
-
           | Field | Value |
           |-------|-------|
-          | 📅 Date | $RUN_DATE |
-          | 🌿 Branch | \`$BRANCH\` |
-          | 🏷️ Test Type | \`$TAG\` |
-          | 🔀 Trigger | \`$TRIGGER\` |
+          | 📅 Date | ${{ env.REPORT_DATE }} |
+          | 🌿 Branch | \`${{ env.META_BRANCH }}\` |
+          | 🏷️ Test Type | \`${{ env.META_TAG }}\` |
+          | 🔀 Trigger | \`${{ env.META_TRIGGER }}\` |
           | 🌐 Base URL | ${{ env.BASE_URL || vars.BASE_URL }} |
           | 📊 Overall Status | $OVERALL |
 
           ## 📈 Results Breakdown
-
           | Metric | Count |
           |--------|-------|
-          | Total Tests | $TOTAL_TESTS |
-          | ✅ Passed | $TOTAL_PASSED |
-          | ❌ Failed | $TOTAL_FAILURES |
-          | 🔴 Errors | $TOTAL_ERRORS |
-          | ⏭️ Skipped | $TOTAL_SKIPPED |
+          | Total Tests | ${{ env.META_TESTS }} |
+          | ✅ Passed | ${{ env.META_PASSED }} |
+          | ❌ Failed | ${{ env.META_FAILURES }} |
+          | 🔴 Errors | ${{ env.META_ERRORS }} |
+          | ⏭️ Skipped | ${{ env.META_SKIPPED }} |
           | 📊 Pass Rate | $PASS_RATE% |
 
           ## 🗂️ Shard Breakdown
-
           | Shard | Tests | Passed | Failed | Errors | Skipped |
           |-------|-------|--------|--------|--------|---------|
           EOF
@@ -358,42 +361,6 @@ jobs:
           | Monthly Report | [View](https://Phillmon8917.github.io/phptravels-reports/monthly-history.html) |
           EOF
 
-      - name: Set run metadata
-        if: always()
-        run: |
-          RUN_ID="${{ github.run_id }}"
-          RUN_DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-          BRANCH="${{ needs.resolve-branch.outputs.branch }}"
-          TAG="${{ inputs.tag != '' && inputs.tag || 'regression' }}"
-          TRIGGER="${{ github.event_name }}"
-          TESTS=${{ steps.aggregate.outputs.tests }}
-          PASSED=${{ steps.aggregate.outputs.passed }}
-          FAILURES=${{ steps.aggregate.outputs.failures }}
-          ERRORS=${{ steps.aggregate.outputs.errors }}
-          SKIPPED=${{ steps.aggregate.outputs.skipped }}
-          if [ "$FAILURES" -eq 0 ] && [ "$ERRORS" -eq 0 ]; then
-            STATUS="passed"
-          else
-            STATUS="failed"
-          fi
-          PASS_RATE=0
-          if [ "$TESTS" -gt 0 ]; then
-            PASS_RATE=$(echo "scale=1; $PASSED * 100 / $TESTS" | bc)
-          fi
-          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "RUN_DATE=$RUN_DATE" >> $GITHUB_ENV
-          echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_ENV
-          echo "META_BRANCH=$BRANCH" >> $GITHUB_ENV
-          echo "META_TAG=$TAG" >> $GITHUB_ENV
-          echo "META_TRIGGER=$TRIGGER" >> $GITHUB_ENV
-          echo "META_TESTS=$TESTS" >> $GITHUB_ENV
-          echo "META_PASSED=$PASSED" >> $GITHUB_ENV
-          echo "META_FAILURES=$FAILURES" >> $GITHUB_ENV
-          echo "META_ERRORS=$ERRORS" >> $GITHUB_ENV
-          echo "META_SKIPPED=$SKIPPED" >> $GITHUB_ENV
-          echo "META_STATUS=$STATUS" >> $GITHUB_ENV
-          echo "META_PASS_RATE=$PASS_RATE" >> $GITHUB_ENV
-
       - name: Checkout gh-pages from phptravels-reports
         if: always()
         uses: actions/checkout@v4
@@ -409,82 +376,12 @@ jobs:
         run: |
           RUN_ID="${{ env.RUN_ID }}"
 
+          # --- Copy Allure and monthly report artefacts ---
           mkdir -p "gh-pages/regression-reports/${RUN_ID}"
           cp -r target/site/allure-maven-plugin/. "gh-pages/regression-reports/${RUN_ID}/"
 
           mkdir -p "gh-pages/monthly-reports/${RUN_ID}"
           cp src/dist/report.html "gh-pages/monthly-reports/${RUN_ID}/index.html"
-
-          RUNS_JSON="gh-pages/regression-runs.json"
-          if [ ! -f "$RUNS_JSON" ]; then
-            echo "[]" > "$RUNS_JSON"
-          fi
-
-          MONTHLY_JSON="gh-pages/monthly-runs.json"
-          if [ ! -f "$MONTHLY_JSON" ]; then
-            echo "[]" > "$MONTHLY_JSON"
-          fi
-
-          python3 -c "
-          import json, os, shutil
-
-          run_id = '$RUN_ID'
-          tests = ${{ env.META_TESTS }}
-          passed = ${{ env.META_PASSED }}
-          failures = ${{ env.META_FAILURES }}
-          errors = ${{ env.META_ERRORS }}
-          skipped = ${{ env.META_SKIPPED }}
-          pass_rate = '${{ env.META_PASS_RATE }}'
-
-          new_regression = {
-            'id': run_id,
-            'date': '${{ env.RUN_DATE }}',
-            'branch': '${{ env.META_BRANCH }}',
-            'tag': '${{ env.META_TAG }}',
-            'trigger': '${{ env.META_TRIGGER }}',
-            'status': '${{ env.META_STATUS }}',
-            'tests': tests,
-            'passed': passed,
-            'failures': failures,
-            'errors': errors,
-            'skipped': skipped,
-            'passRate': pass_rate,
-            'reportPath': f'regression-reports/{run_id}/index.html'
-          }
-
-          new_monthly = {
-            'id': run_id,
-            'date': '${{ env.RUN_DATE }}',
-            'branch': '${{ env.META_BRANCH }}',
-            'tag': '${{ env.META_TAG }}',
-            'trigger': '${{ env.META_TRIGGER }}',
-            'status': '${{ env.META_STATUS }}',
-            'tests': tests,
-            'passed': passed,
-            'failures': failures,
-            'errors': errors,
-            'skipped': skipped,
-            'passRate': pass_rate,
-            'reportPath': f'monthly-reports/{run_id}/index.html'
-          }
-
-          for json_path, new_entry, report_prefix in [
-            ('gh-pages/regression-runs.json', new_regression, 'regression-reports'),
-            ('gh-pages/monthly-runs.json', new_monthly, 'monthly-reports'),
-          ]:
-            with open(json_path) as f:
-              runs = json.load(f)
-            runs.insert(0, new_entry)
-            if len(runs) > 50:
-              removed = runs[50:]
-              runs = runs[:50]
-              for r in removed:
-                old_dir = 'gh-pages/' + r['reportPath'].replace('/index.html','')
-                if os.path.isdir(old_dir):
-                  shutil.rmtree(old_dir)
-            with open(json_path, 'w') as f:
-              json.dump(runs, f, indent=2)
-          "
 
           mkdir -p gh-pages/regression-report
           cp -r target/site/allure-maven-plugin/. gh-pages/regression-report/
@@ -492,505 +389,71 @@ jobs:
           mkdir -p gh-pages/monthly-report
           cp src/dist/report.html gh-pages/monthly-report/index.html
 
-          HISTORY_TEMPLATE=$(cat << 'TMPL'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8"/>
-            <title>%%TITLE%% — QA Dashboard</title>
-            <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-            <style>
-              :root{--bg:#0b0d12;--surface:#111318;--surface2:#161b25;--border:#1f2330;--accent:%%ACCENT%%;--text:#e8eaf0;--muted:#6b7080;--red:#ff5b5b;--green:#4fffb0;--yellow:#ffb84f;}
-              *{box-sizing:border-box;margin:0;padding:0;}
-              body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:40px 24px;}
-              a{color:inherit;text-decoration:none;}
-              .back{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:40px;transition:color .2s;}
-              .back:hover{color:var(--accent);}
-              .header{margin-bottom:32px;}
-              .badge{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);background:rgba(79,255,176,.08);border:1px solid rgba(79,255,176,.2);padding:4px 14px;border-radius:2px;margin-bottom:16px;}
-              h1{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:800;letter-spacing:-.03em;margin-bottom:6px;}
-              h1 span{color:var(--accent);}
-              .sub{color:var(--muted);font-size:14px;}
-              .toolbar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px;align-items:center;}
-              .search-wrap{position:relative;flex:1;min-width:220px;}
-              .search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px 10px 36px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
-              .search-wrap input:focus{border-color:var(--accent);}
-              .search-wrap .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;}
-              select{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;outline:none;cursor:pointer;transition:border-color .2s;}
-              select:focus{border-color:var(--accent);}
-              .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all .2s;}
-              .btn:hover{border-color:var(--accent);color:var(--accent);}
-              .btn.danger:hover{border-color:var(--red);color:var(--red);}
-              .btn.primary{background:var(--accent);color:#0b0d12;border-color:var(--accent);font-weight:700;}
-              .btn.primary:hover{opacity:.85;}
-              .stats-bar{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px;}
-              .stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 20px;flex:1;min-width:100px;}
-              .stat-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-              .stat-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
-              .stat-value.green{color:var(--green);}
-              .stat-value.red{color:var(--red);}
-              .stat-value.yellow{color:var(--yellow);}
-              .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
-              table{width:100%;border-collapse:collapse;font-size:13px;}
-              thead th{background:var(--surface2);padding:12px 16px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
-              thead th:hover{color:var(--text);}
-              thead th .sort-icon{margin-left:4px;opacity:.4;}
-              thead th.sorted .sort-icon{opacity:1;color:var(--accent);}
-              tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
-              tbody tr:last-child{border-bottom:none;}
-              tbody tr:hover{background:var(--surface2);}
-              tbody td{padding:14px 16px;vertical-align:middle;}
-              .cb{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);}
-              .run-id{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
-              .badge-status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;}
-              .badge-status.passed{background:rgba(79,255,176,.12);color:var(--green);border:1px solid rgba(79,255,176,.25);}
-              .badge-status.failed{background:rgba(255,91,91,.12);color:var(--red);border:1px solid rgba(255,91,91,.25);}
-              .badge-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
-              .badge-trigger{display:inline-block;padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;}
-              .badge-trigger.schedule{background:rgba(124,158,255,.1);color:#7c9eff;border:1px solid rgba(124,158,255,.2);}
-              .badge-trigger.workflow_dispatch{background:rgba(255,184,79,.1);color:#ffb84f;border:1px solid rgba(255,184,79,.2);}
-              .badge-trigger.pull_request{background:rgba(79,255,176,.1);color:#4fffb0;border:1px solid rgba(79,255,176,.2);}
-              .pass-bar{display:flex;align-items:center;gap:8px;}
-              .bar-outer{width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
-              .bar-inner{height:100%;border-radius:3px;background:var(--accent);}
-              .bar-inner.low{background:var(--red);}
-              .bar-inner.mid{background:var(--yellow);}
-              .actions{display:flex;gap:6px;}
-              .action-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;font-size:13px;}
-              .action-btn:hover{border-color:var(--accent);color:var(--accent);}
-              .action-btn.del:hover{border-color:var(--red);color:var(--red);}
-              .pagination{display:flex;align-items:center;justify-content:space-between;margin-top:20px;flex-wrap:wrap;gap:12px;}
-              .page-info{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
-              .page-btns{display:flex;gap:6px;}
-              .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;}
-              .page-btn:hover,.page-btn.active{border-color:var(--accent);color:var(--accent);}
-              .page-btn:disabled{opacity:.3;cursor:not-allowed;}
-              .empty{text-align:center;padding:60px 20px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;}
-              .bulk-bar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;}
-              .bulk-bar span{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
-              .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
-              .modal-overlay.open{display:flex;}
-              .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;max-width:400px;width:100%;}
-              .modal h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:12px;}
-              .modal p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:24px;}
-              .modal-actions{display:flex;gap:12px;justify-content:flex-end;}
-              .footer{margin-top:40px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:center;}
-              .footer span{color:var(--accent);}
-            </style>
-          </head>
-          <body>
-            <a href="./index.html" class="back">← Back to dashboard</a>
-            <div class="header">
-              <div class="badge">QA Automation · Java · PHPTRAVELS</div>
-              <h1>%%ICON%% <span>%%TITLE%%</span> History</h1>
-              <p class="sub">All runs — browse, filter, search and open individual reports. Max 50 stored.</p>
-            </div>
+          # --- Initialise JSON files if absent ---
+          [ -f gh-pages/regression-runs.json ] || echo "[]" > gh-pages/regression-runs.json
+          [ -f gh-pages/monthly-runs.json    ] || echo "[]" > gh-pages/monthly-runs.json
+          [ -f gh-pages/sanity-runs.json     ] || echo "[]" > gh-pages/sanity-runs.json
 
-            <div class="stats-bar" id="statsBar"></div>
+          # --- Update run history JSON files ---
+          python3 - << PYEOF
+          import json, os, shutil
 
-            <div class="toolbar">
-              <div class="search-wrap">
-                <span class="ico">🔍</span>
-                <input type="text" id="searchInput" placeholder="Search by run ID, branch, trigger…"/>
-              </div>
-              <select id="statusFilter">
-                <option value="">All Statuses</option>
-                <option value="passed">Passed</option>
-                <option value="failed">Failed</option>
-              </select>
-              <select id="triggerFilter">
-                <option value="">All Triggers</option>
-                <option value="schedule">Schedule</option>
-                <option value="workflow_dispatch">Manual</option>
-                <option value="pull_request">Pull Request</option>
-              </select>
-              <select id="branchFilter">
-                <option value="">All Branches</option>
-              </select>
-              <select id="pageSizeSelect">
-                <option value="10">10 / page</option>
-                <option value="12" selected>12 / page</option>
-                <option value="25">25 / page</option>
-                <option value="50">50 / page</option>
-              </select>
-              <button class="btn danger" id="bulkDeleteBtn" style="display:none" onclick="openBulkDelete()">🗑 Delete Selected</button>
-            </div>
+          run_id   = os.environ['RUN_ID']
+          run_date = os.environ['RUN_DATE']
+          branch   = os.environ['META_BRANCH']
+          tag      = os.environ['META_TAG']
+          trigger  = os.environ['META_TRIGGER']
+          status   = os.environ['META_STATUS']
+          tests    = int(os.environ['META_TESTS'])
+          passed   = int(os.environ['META_PASSED'])
+          failures = int(os.environ['META_FAILURES'])
+          errors   = int(os.environ['META_ERRORS'])
+          skipped  = int(os.environ['META_SKIPPED'])
+          pass_rate = os.environ['META_PASS_RATE']
 
-            <div id="bulkBar" class="bulk-bar" style="display:none">
-              <span id="bulkCount">0 selected</span>
-              <button class="btn" onclick="selectAll()">Select All</button>
-              <button class="btn" onclick="clearSelection()">Clear</button>
-            </div>
+          base = {'id':run_id,'date':run_date,'branch':branch,'tag':tag,'trigger':trigger,
+                  'status':status,'tests':tests,'passed':passed,'failures':failures,
+                  'errors':errors,'skipped':skipped,'passRate':pass_rate}
 
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th><input type="checkbox" class="cb" id="masterCb" onchange="toggleAll(this)"/></th>
-                    <th onclick="sortBy('id')">Run ID <span class="sort-icon" data-col="id">↕</span></th>
-                    <th onclick="sortBy('date')">Date & Time <span class="sort-icon" data-col="date">↕</span></th>
-                    <th onclick="sortBy('branch')">Branch <span class="sort-icon" data-col="branch">↕</span></th>
-                    <th onclick="sortBy('tag')">Tag <span class="sort-icon" data-col="tag">↕</span></th>
-                    <th onclick="sortBy('trigger')">Trigger <span class="sort-icon" data-col="trigger">↕</span></th>
-                    <th onclick="sortBy('status')">Status <span class="sort-icon" data-col="status">↕</span></th>
-                    <th onclick="sortBy('tests')">Tests <span class="sort-icon" data-col="tests">↕</span></th>
-                    <th onclick="sortBy('passed')">Passed <span class="sort-icon" data-col="passed">↕</span></th>
-                    <th onclick="sortBy('failures')">Failed <span class="sort-icon" data-col="failures">↕</span></th>
-                    <th onclick="sortBy('passRate')">Pass Rate <span class="sort-icon" data-col="passRate">↕</span></th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-              </table>
-            </div>
+          for json_path, report_prefix in [
+            ('gh-pages/regression-runs.json', 'regression-reports'),
+            ('gh-pages/monthly-runs.json',    'monthly-reports'),
+          ]:
+            with open(json_path) as f:
+              runs = json.load(f)
+            entry = {**base, 'reportPath': f'{report_prefix}/{run_id}/index.html'}
+            runs.insert(0, entry)
+            if len(runs) > 50:
+              for r in runs[50:]:
+                old = 'gh-pages/' + r['reportPath'].replace('/index.html','')
+                if os.path.isdir(old):
+                  shutil.rmtree(old)
+              runs = runs[:50]
+            with open(json_path, 'w') as f:
+              json.dump(runs, f, indent=2)
+          PYEOF
 
-            <div class="pagination">
-              <span class="page-info" id="pageInfo"></span>
-              <div class="page-btns" id="pageBtns"></div>
-            </div>
+          # --- Render history pages from template ---
+          TMPL=".github/templates/history.html"
+          REPORT_DATE="${{ env.REPORT_DATE }}"
 
-            <div class="modal-overlay" id="deleteModal">
-              <div class="modal">
-                <h3>Delete Runs</h3>
-                <p id="deleteModalMsg">Are you sure you want to delete the selected runs?</p>
-                <div class="modal-actions">
-                  <button class="btn" onclick="closeModal()">Cancel</button>
-                  <button class="btn primary" style="background:var(--red);border-color:var(--red);" onclick="confirmDelete()">Delete</button>
-                </div>
-              </div>
-            </div>
+          sed -e 's|%%TITLE%%|Regression|g' \
+              -e 's|%%ICON%%|🧪|g' \
+              -e 's|%%ACCENT%%|#4fffb0|g' \
+              -e "s|%%DATE%%|${REPORT_DATE}|g" \
+              -e 's|%%DATA_FILE%%|regression-runs.json|g' \
+              "$TMPL" > gh-pages/regression-history.html
 
-            <div class="footer">Last updated: %%DATE%% &nbsp;·&nbsp; Branch: <span>java-reports</span></div>
+          sed -e 's|%%TITLE%%|Monthly|g' \
+              -e 's|%%ICON%%|📊|g' \
+              -e 's|%%ACCENT%%|#ffb84f|g' \
+              -e "s|%%DATE%%|${REPORT_DATE}|g" \
+              -e 's|%%DATA_FILE%%|monthly-runs.json|g' \
+              "$TMPL" > gh-pages/monthly-history.html
 
-            <script>
-              const DATA_FILE = '%%DATA_FILE%%';
-              const BASE_PATH = 'https://Phillmon8917.github.io/phptravels-reports/';
-
-              let allRuns = [];
-              let filtered = [];
-              let selected = new Set();
-              let sortCol = 'date';
-              let sortDir = -1;
-              let page = 1;
-              let pageSize = 12;
-
-              async function loadData() {
-                try {
-                  const r = await fetch(BASE_PATH + DATA_FILE + '?t=' + Date.now());
-                  allRuns = await r.json();
-                } catch(e) {
-                  allRuns = [];
-                }
-                populateBranchFilter();
-                applyFilters();
-              }
-
-              function populateBranchFilter() {
-                const sel = document.getElementById('branchFilter');
-                const branches = [...new Set(allRuns.map(r => r.branch))].filter(Boolean);
-                branches.forEach(b => {
-                  const opt = document.createElement('option');
-                  opt.value = b; opt.textContent = b;
-                  sel.appendChild(opt);
-                });
-              }
-
-              function applyFilters() {
-                const q = document.getElementById('searchInput').value.toLowerCase();
-                const status = document.getElementById('statusFilter').value;
-                const trigger = document.getElementById('triggerFilter').value;
-                const branch = document.getElementById('branchFilter').value;
-                filtered = allRuns.filter(r => {
-                  const matchQ = !q || r.id.toLowerCase().includes(q) || (r.branch||'').toLowerCase().includes(q) || (r.trigger||'').toLowerCase().includes(q) || (r.tag||'').toLowerCase().includes(q);
-                  const matchS = !status || r.status === status;
-                  const matchT = !trigger || r.trigger === trigger;
-                  const matchB = !branch || r.branch === branch;
-                  return matchQ && matchS && matchT && matchB;
-                });
-                sortData();
-                page = 1;
-                render();
-              }
-
-              function sortData() {
-                filtered.sort((a, b) => {
-                  let av = a[sortCol], bv = b[sortCol];
-                  if (sortCol === 'passRate') { av = parseFloat(av)||0; bv = parseFloat(bv)||0; }
-                  if (typeof av === 'number') return (av - bv) * sortDir;
-                  return String(av||'').localeCompare(String(bv||'')) * sortDir;
-                });
-              }
-
-              function sortBy(col) {
-                if (sortCol === col) sortDir *= -1;
-                else { sortCol = col; sortDir = -1; }
-                document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
-                document.querySelectorAll('.sort-icon').forEach(ic => { ic.textContent = '↕'; ic.style.opacity = '.4'; });
-                const th = document.querySelector('[data-col="' + col + '"]');
-                if (th) {
-                  th.parentElement.classList.add('sorted');
-                  th.textContent = sortDir === -1 ? '↓' : '↑';
-                  th.style.opacity = '1';
-                }
-                sortData();
-                render();
-              }
-
-              function render() {
-                renderStats();
-                const start = (page - 1) * pageSize;
-                const pageItems = filtered.slice(start, start + pageSize);
-                const tbody = document.getElementById('tableBody');
-                if (filtered.length === 0) {
-                  tbody.innerHTML = '<tr><td colspan="12" class="empty">NO RUNS FOUND · Try adjusting your filters</td></tr>';
-                  document.getElementById('pageInfo').textContent = '';
-                  document.getElementById('pageBtns').innerHTML = '';
-                  return;
-                }
-                tbody.innerHTML = pageItems.map(r => {
-                  const rate = parseFloat(r.passRate) || 0;
-                  const barClass = rate >= 80 ? '' : rate >= 50 ? 'mid' : 'low';
-                  const isSelected = selected.has(r.id);
-                  const dateStr = r.date ? new Date(r.date).toLocaleString('en-ZA', {dateStyle:'medium',timeStyle:'short'}) : '—';
-                  return '<tr>' +
-                    '<td><input type="checkbox" class="cb" data-id="' + r.id + '" ' + (isSelected?'checked':'') + ' onchange="toggleRow(\'' + r.id + '\',this)"/></td>' +
-                    '<td><span class="run-id">' + r.id + '</span></td>' +
-                    '<td style="white-space:nowrap">' + dateStr + '</td>' +
-                    '<td><code style="font-size:12px;color:var(--accent)">' + (r.branch||'—') + '</code></td>' +
-                    '<td><span class="badge-tag">' + (r.tag||'—') + '</span></td>' +
-                    '<td><span class="badge-trigger ' + (r.trigger||'') + '">' + triggerLabel(r.trigger) + '</span></td>' +
-                    '<td><span class="badge-status ' + (r.status||'') + '">' + (r.status==='passed'?'✅ Passed':'❌ Failed') + '</span></td>' +
-                    '<td style="font-family:\'DM Mono\',monospace">' + (r.tests||0) + '</td>' +
-                    '<td style="font-family:\'DM Mono\',monospace;color:var(--green)">' + (r.passed||0) + '</td>' +
-                    '<td style="font-family:\'DM Mono\',monospace;color:' + ((r.failures||0)>0?'var(--red)':'var(--muted)') + '">' + (r.failures||0) + '</td>' +
-                    '<td><div class="pass-bar"><div class="bar-outer"><div class="bar-inner ' + barClass + '" style="width:' + Math.min(rate,100) + '%"></div></div><span style="font-family:\'DM Mono\',monospace;font-size:11px">' + rate + '%</span></div></td>' +
-                    '<td><div class="actions">' +
-                    '<a href="' + BASE_PATH + r.reportPath + '" target="_blank" title="Open report" class="action-btn">📋</a>' +
-                    '<button onclick="deleteOne(\'' + r.id + '\')" title="Delete" class="action-btn del">🗑</button>' +
-                    '</div></td>' +
-                    '</tr>';
-                }).join('');
-
-                const total = filtered.length;
-                const totalPages = Math.ceil(total / pageSize);
-                document.getElementById('pageInfo').textContent = 'Showing ' + (start+1) + '–' + Math.min(start+pageSize,total) + ' of ' + total + ' runs';
-                renderPagination(totalPages);
-                updateBulkUI();
-              }
-
-              function triggerLabel(t) {
-                if (t === 'schedule') return '🕐 Schedule';
-                if (t === 'workflow_dispatch') return '▶ Manual';
-                if (t === 'pull_request') return '🔀 PR';
-                return t || '—';
-              }
-
-              function renderStats() {
-                const total = filtered.length;
-                const passed = filtered.filter(r => r.status === 'passed').length;
-                const failed = filtered.filter(r => r.status === 'failed').length;
-                const avgRate = total ? (filtered.reduce((s,r)=>s+(parseFloat(r.passRate)||0),0)/total).toFixed(1) : '0.0';
-                document.getElementById('statsBar').innerHTML =
-                  '<div class="stat"><div class="stat-label">Total Runs</div><div class="stat-value">' + total + '</div></div>' +
-                  '<div class="stat"><div class="stat-label">Passed</div><div class="stat-value green">' + passed + '</div></div>' +
-                  '<div class="stat"><div class="stat-label">Failed</div><div class="stat-value red">' + failed + '</div></div>' +
-                  '<div class="stat"><div class="stat-label">Avg Pass Rate</div><div class="stat-value ' + (parseFloat(avgRate)>=80?'green':parseFloat(avgRate)>=50?'yellow':'red') + '">' + avgRate + '%</div></div>';
-              }
-
-              function renderPagination(totalPages) {
-                const btns = document.getElementById('pageBtns');
-                btns.innerHTML = '';
-                const addBtn = (label, p, disabled, active) => {
-                  const b = document.createElement('button');
-                  b.className = 'page-btn' + (active?' active':'');
-                  b.textContent = label;
-                  b.disabled = disabled;
-                  b.onclick = () => { page = p; render(); };
-                  btns.appendChild(b);
-                };
-                addBtn('«', 1, page===1, false);
-                addBtn('‹', page-1, page===1, false);
-                const start = Math.max(1, page-2);
-                const end = Math.min(totalPages, page+2);
-                for(let i=start;i<=end;i++) addBtn(i, i, false, i===page);
-                addBtn('›', page+1, page===totalPages, false);
-                addBtn('»', totalPages, page===totalPages, false);
-              }
-
-              function toggleRow(id, cb) {
-                if (cb.checked) selected.add(id); else selected.delete(id);
-                updateBulkUI();
-              }
-
-              function toggleAll(masterCb) {
-                const cbs = document.querySelectorAll('tbody .cb');
-                cbs.forEach(cb => {
-                  cb.checked = masterCb.checked;
-                  const id = cb.dataset.id;
-                  if (masterCb.checked) selected.add(id); else selected.delete(id);
-                });
-                updateBulkUI();
-              }
-
-              function selectAll() {
-                filtered.forEach(r => selected.add(r.id));
-                render();
-              }
-
-              function clearSelection() {
-                selected.clear();
-                document.getElementById('masterCb').checked = false;
-                render();
-              }
-
-              function updateBulkUI() {
-                const n = selected.size;
-                document.getElementById('bulkDeleteBtn').style.display = n > 0 ? '' : 'none';
-                document.getElementById('bulkBar').style.display = n > 0 ? 'flex' : 'none';
-                document.getElementById('bulkCount').textContent = n + ' selected';
-              }
-
-              let pendingDelete = null;
-
-              function openBulkDelete() {
-                pendingDelete = [...selected];
-                document.getElementById('deleteModalMsg').textContent = 'Delete ' + pendingDelete.length + ' selected run(s) from the history list?';
-                document.getElementById('deleteModal').classList.add('open');
-              }
-
-              function deleteOne(id) {
-                pendingDelete = [id];
-                document.getElementById('deleteModalMsg').textContent = 'Delete run ' + id + ' from the history list?';
-                document.getElementById('deleteModal').classList.add('open');
-              }
-
-              function closeModal() {
-                document.getElementById('deleteModal').classList.remove('open');
-                pendingDelete = null;
-              }
-
-              function confirmDelete() {
-                if (!pendingDelete) return;
-                allRuns = allRuns.filter(r => !pendingDelete.includes(r.id));
-                pendingDelete.forEach(id => selected.delete(id));
-                closeModal();
-                applyFilters();
-                alert('Runs removed from local view.\n\nTo permanently remove from the server, commit the updated JSON file to the repository.');
-              }
-
-              ['searchInput','statusFilter','triggerFilter','branchFilter'].forEach(id => {
-                document.getElementById(id).addEventListener('input', applyFilters);
-                document.getElementById(id).addEventListener('change', applyFilters);
-              });
-              document.getElementById('pageSizeSelect').addEventListener('change', function() {
-                pageSize = parseInt(this.value);
-                page = 1;
-                render();
-              });
-
-              loadData();
-            </script>
-          </body>
-          </html>
-          TMPL
-          )
-
-          echo "$HISTORY_TEMPLATE" | \
-            sed 's|%%TITLE%%|Regression|g' | \
-            sed 's|%%ICON%%|🧪|g' | \
-            sed 's|%%ACCENT%%|#4fffb0|g' | \
-            sed "s|%%DATE%%|${{ env.REPORT_DATE }}|g" | \
-            sed 's|%%DATA_FILE%%|regression-runs.json|g' \
-            > gh-pages/regression-history.html
-
-          echo "$HISTORY_TEMPLATE" | \
-            sed 's|%%TITLE%%|Monthly|g' | \
-            sed 's|%%ICON%%|📊|g' | \
-            sed 's|%%ACCENT%%|#ffb84f|g' | \
-            sed "s|%%DATE%%|${{ env.REPORT_DATE }}|g" | \
-            sed 's|%%DATA_FILE%%|monthly-runs.json|g' \
-            > gh-pages/monthly-history.html
-
-          if [ ! -f gh-pages/sanity-runs.json ]; then
-            echo "[]" > gh-pages/sanity-runs.json
-          fi
-
-          cat > gh-pages/index.html << 'HTML'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <title>Java QA Dashboard</title>
-            <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-            <style>
-              :root { --bg:#0b0d12; --surface:#111318; --border:#1f2330; --accent:#4fffb0; --accent2:#7c9eff; --accent3:#ffb84f; --text:#e8eaf0; --muted:#6b7080; }
-              * { box-sizing:border-box; margin:0; padding:0; }
-              body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif;
-                     min-height:100vh; display:flex; flex-direction:column;
-                     align-items:center; justify-content:center; padding:48px 24px; }
-              .badge { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.2em;
-                       text-transform:uppercase; color:var(--accent);
-                       background:rgba(79,255,176,.08); border:1px solid rgba(79,255,176,.2);
-                       padding:4px 14px; border-radius:2px; margin-bottom:24px; }
-              h1 { font-family:'Syne',sans-serif; font-size:clamp(32px,6vw,56px);
-                   font-weight:800; letter-spacing:-.03em; text-align:center; margin-bottom:12px; }
-              h1 span { color:var(--accent); }
-              .sub { color:var(--muted); font-size:15px; text-align:center; margin-bottom:56px; }
-              .section-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.15em;
-                               text-transform:uppercase; color:var(--muted); margin-bottom:20px;
-                               text-align:center; }
-              .cards { display:flex; gap:24px; flex-wrap:wrap; justify-content:center; margin-bottom:48px; }
-              .card { background:var(--surface); border:1px solid var(--border); border-radius:12px;
-                      padding:32px 28px; text-decoration:none; color:inherit; width:300px;
-                      transition:transform .2s,border-color .2s; position:relative; overflow:hidden; }
-              .card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-              .card.green::before  { background:var(--accent); }
-              .card.blue::before   { background:var(--accent2); }
-              .card.orange::before { background:var(--accent3); }
-              .card:hover { transform:translateY(-4px); border-color:#3a3f50; }
-              .card-icon { font-size:32px; margin-bottom:16px; }
-              .card-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-bottom:8px; }
-              .card-desc { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:24px; }
-              .card-link { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
-              .card.green  .card-link { color:var(--accent); }
-              .card.blue   .card-link { color:var(--accent2); }
-              .card.orange .card-link { color:var(--accent3); }
-              .footer { margin-top:8px; font-family:'DM Mono',monospace; font-size:11px;
-                        color:var(--muted); text-align:center; line-height:1.8; }
-              .footer span { color:var(--accent); }
-            </style>
-          </head>
-          <body>
-            <div class="badge">QA Automation · Java · PHPTRAVELS</div>
-            <h1>Java Test <span>Dashboard</span></h1>
-            <p class="sub">Sanity, regression and monthly QA reports for the Java Playwright suite.</p>
-            <div class="section-label">Reports</div>
-            <div class="cards">
-              <a href="./sanity-history.html" class="card blue">
-                <div class="card-icon">⚡</div>
-                <div class="card-title">Sanity Reports</div>
-                <div class="card-desc">All sanity runs — browse, filter, search and open any individual run report.</div>
-                <div class="card-link">View history →</div>
-              </a>
-              <a href="./regression-history.html" class="card green">
-                <div class="card-icon">🧪</div>
-                <div class="card-title">Regression Reports</div>
-                <div class="card-desc">All regression runs with full Allure details, logs, screenshots and step-level results.</div>
-                <div class="card-link">View history →</div>
-              </a>
-              <a href="./monthly-history.html" class="card orange">
-                <div class="card-icon">📊</div>
-                <div class="card-title">Monthly QA Reports</div>
-                <div class="card-desc">Monthly trend and pass-rate reports aggregated across every run.</div>
-                <div class="card-link">View history →</div>
-              </a>
-            </div>
-            <div class="footer">
-              Last updated by regression workflow: ${{ env.REPORT_DATE }} &nbsp;·&nbsp; Branch: <span>java-reports</span>
-            </div>
-          </body>
-          </html>
-          HTML
+          # --- Render dashboard index from template ---
+          sed "s|%%DATE%%|${REPORT_DATE}|g" \
+              .github/templates/index.html > gh-pages/index.html
 
       - name: Deploy to GitHub Pages
         if: always()
