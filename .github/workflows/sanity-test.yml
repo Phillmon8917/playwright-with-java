@@ -42,19 +42,19 @@ on:
       base_url:
         description: "Base URL"
         required: false
-        default: ""
+        default: "https://phptravels.net/"
       action_timeout:
         description: "Action timeout (ms)"
         required: false
-        default: ""
+        default: "80000"
       navigation_timeout:
         description: "Navigation timeout (ms)"
         required: false
-        default: ""
+        default: "120000"
       test_timeout:
         description: "Test timeout (ms)"
         required: false
-        default: ""
+        default: "360000"
 
 jobs:
   resolve-branch:
