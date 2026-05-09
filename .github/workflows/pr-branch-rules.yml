@@ -29,40 +29,26 @@ jobs:
 
           fail() { echo "❌ ERROR: $1"; exit 1; }
 
-          if [[ "$SOURCE_BRANCH" =~ ^sync/ ]]; then
-            if [[ "$SOURCE_BRANCH" != "sync/develop-to-qa" ]] && [[ "$SOURCE_BRANCH" != "sync/qa-to-main" ]]; then
-              fail "Unknown sync branch '$SOURCE_BRANCH'. Only 'sync/develop-to-qa' and 'sync/qa-to-main' are allowed."
+          if [[ "$SOURCE_BRANCH" != "develop" && "$SOURCE_BRANCH" != "qa" && "$SOURCE_BRANCH" != "main" ]]; then
+            if [[ ! "$SOURCE_BRANCH" =~ ^(feature|bugfix|hotfix)/ ]]; then
+              fail "Branch '$SOURCE_BRANCH' is invalid. New branches must start with 'feature/', 'bugfix/', or 'hotfix/'."
             fi
-            if [[ "$SOURCE_BRANCH" == "sync/develop-to-qa" ]] && [[ "$DEST_BRANCH" != "qa" ]]; then
-              fail "Branch 'sync/develop-to-qa' must target 'qa'."
-            fi
-            if [[ "$SOURCE_BRANCH" == "sync/qa-to-main" ]] && [[ "$DEST_BRANCH" != "main" ]]; then
-              fail "Branch 'sync/qa-to-main' must target 'main'."
-            fi
-            if [[ "$SOURCE_BRANCH" == "sync/develop-to-qa" ]]; then
-              git fetch origin develop
-              BEHIND=$(git rev-list --count HEAD..origin/develop)
-              if [ "$BEHIND" -gt 0 ]; then
-                fail "Branch 'sync/develop-to-qa' is not fully up to date with 'develop'. Merge develop into this branch first."
-              fi
-            fi
-            if [[ "$SOURCE_BRANCH" == "sync/qa-to-main" ]]; then
-              git fetch origin qa
-              BEHIND=$(git rev-list --count HEAD..origin/qa)
-              if [ "$BEHIND" -gt 0 ]; then
-                fail "Branch 'sync/qa-to-main' is not fully up to date with 'qa'. Merge qa into this branch first."
-              fi
-            fi
-            echo "✅ Sync branch validated successfully."
-            exit 0
           fi
 
-          if [[ ! "$SOURCE_BRANCH" =~ ^(feature|bugfix|hotfix)/ ]]; then
-            fail "Branch '$SOURCE_BRANCH' is invalid. New branches must start with 'feature/', 'bugfix/', or 'hotfix/'."
+          if [[ "$SOURCE_BRANCH" =~ ^(feature|bugfix|hotfix)/ ]] && [[ "$DEST_BRANCH" != "develop" ]]; then
+            fail "Branch '$SOURCE_BRANCH' must target 'develop'. PRs from feature/bugfix/hotfix branches cannot target '$DEST_BRANCH'."
           fi
 
-          if [[ "$DEST_BRANCH" != "develop" ]]; then
-            fail "Branch '$SOURCE_BRANCH' must target 'develop'. Only 'sync/develop-to-qa' can target 'qa' and only 'sync/qa-to-main' can target 'main'."
+          if [[ "$SOURCE_BRANCH" == "develop" ]] && [[ "$DEST_BRANCH" != "qa" ]]; then
+            fail "Branch 'develop' must target 'qa'. PRs from 'develop' to '$DEST_BRANCH' are not allowed."
+          fi
+
+          if [[ "$SOURCE_BRANCH" == "qa" ]] && [[ "$DEST_BRANCH" != "main" ]]; then
+            fail "Branch 'qa' must target 'main'. PRs from 'qa' to '$DEST_BRANCH' are not allowed."
+          fi
+
+          if [[ "$SOURCE_BRANCH" == "main" ]]; then
+            fail "Direct PRs from 'main' are blocked. Changes must flow from 'qa' → 'main'."
           fi
 
           echo "✅ PR branch rules ran successfully."
