@@ -5,6 +5,11 @@ on:
     branches:
       - "**"
     types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - develop
+      - qa
+      - main
 
 jobs:
   branch-validation:
@@ -17,6 +22,7 @@ jobs:
           fetch-depth: 0
 
       - name: Validate PR branches
+        if: github.event_name == 'pull_request'
         shell: bash
         run: |
           echo "Starting PR branch validation..."
@@ -54,6 +60,7 @@ jobs:
           echo "✅ PR branch rules ran successfully."
 
       - name: Check branch is up to date
+        if: github.event_name == 'pull_request'
         shell: bash
         run: |
           git fetch origin ${{ github.event.pull_request.base.ref }}
