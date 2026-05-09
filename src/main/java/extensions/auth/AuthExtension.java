@@ -1,4 +1,4 @@
-package extensions;
+package extensions.auth;
 
 import org.junit.jupiter.api.extension.*;
 import utils.logger.LoggingUtil;

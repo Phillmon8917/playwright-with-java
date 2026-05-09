@@ -1,4 +1,4 @@
-package extensions;
+package extensions.reporting;
 
 import io.qameta.allure.Allure;
 import com.microsoft.playwright.*;

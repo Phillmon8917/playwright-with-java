@@ -85,12 +85,9 @@ jobs:
       AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
       AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
       BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
-      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout ||
-        vars.ACTION_TIMEOUT }}
-      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' &&
-        inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
-      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout ||
-        vars.TEST_TIMEOUT }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
       DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
       DATA_REPO_OWNER: Phillmon8917
       DATA_REPO_NAME: phptravels-reports
@@ -110,19 +107,19 @@ jobs:
           cache: maven
 
       - name: Install Playwright browsers
-        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI
-          -Dexec.args="install --with-deps"
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
 
       - name: Run authentication first
-        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="authentication"
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dincludes="**/AuthRunner.java" -Dskip.main.tests=true
 
       - name: Run sanity tests
         id: run_tests
         run: |
+          set -o pipefail
           mvn test -Dsurefire.failIfNoSpecifiedTests=false \
+            -Dskip.auth.tests=true \
             -Dgroups="${{ inputs.tag != '' && inputs.tag || 'sanity' }}" \
             | tee test-output.txt
-          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
 
       - name: Parse test results
         if: always()
@@ -138,6 +135,10 @@ jobs:
           echo "failures=$FAILURES" >> $GITHUB_OUTPUT
           echo "errors=$ERRORS"     >> $GITHUB_OUTPUT
           echo "skipped=$SKIPPED"   >> $GITHUB_OUTPUT
+          if [ "$FAILURES" -gt 0 ] || [ "$ERRORS" -gt 0 ]; then
+            echo "❌ Tests failed: $FAILURES failure(s), $ERRORS error(s)"
+            exit 1
+          fi
 
       - name: Write run summary
         if: always()
@@ -147,8 +148,9 @@ jobs:
           FAILURES=${{ steps.parse.outputs.failures }}
           ERRORS=${{ steps.parse.outputs.errors }}
           SKIPPED=${{ steps.parse.outputs.skipped }}
+          EXECUTED=$((TESTS - SKIPPED))
           PASS_RATE=0
-          [ "$TESTS" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $TESTS" | bc)
+          [ "$EXECUTED" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $EXECUTED" | bc)
           [ "$FAILURES" -eq 0 ] && [ "$ERRORS" -eq 0 ] && OVERALL="✅ All Passed" || OVERALL="❌ Some Failed"
 
           PR_LINK=""
@@ -195,8 +197,9 @@ jobs:
           FAILURES=${{ steps.parse.outputs.failures }}
           ERRORS=${{ steps.parse.outputs.errors }}
           SKIPPED=${{ steps.parse.outputs.skipped }}
+          EXECUTED=$((TESTS - SKIPPED))
           PASS_RATE=0
-          [ "$TESTS" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $TESTS" | bc)
+          [ "$EXECUTED" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $EXECUTED" | bc)
           [ "$FAILURES" -eq 0 ] && [ "$ERRORS" -eq 0 ] && STATUS="passed" || STATUS="failed"
 
           echo "RUN_ID=${{ github.run_id }}"                                    >> $GITHUB_ENV
@@ -228,19 +231,16 @@ jobs:
         run: |
           RUN_ID="${{ env.RUN_ID }}"
 
-          # --- Copy Allure artefacts ---
           mkdir -p "gh-pages/sanity-reports/${RUN_ID}"
           cp -r target/site/allure-maven-plugin/. "gh-pages/sanity-reports/${RUN_ID}/"
 
           mkdir -p gh-pages/sanity-report
           cp -r target/site/allure-maven-plugin/. gh-pages/sanity-report/
 
-          # --- Initialise JSON files if absent ---
           [ -f gh-pages/sanity-runs.json      ] || echo "[]" > gh-pages/sanity-runs.json
           [ -f gh-pages/regression-runs.json  ] || echo "[]" > gh-pages/regression-runs.json
           [ -f gh-pages/monthly-runs.json     ] || echo "[]" > gh-pages/monthly-runs.json
 
-          # --- Update sanity run history ---
           python3 - << PYEOF
           import json, os, shutil
 
@@ -271,15 +271,13 @@ jobs:
           if len(runs) > 50:
             for r in runs[50:]:
               old = 'gh-pages/' + r['reportPath'].replace('/index.html','')
-              if os.path.isdir(old):
-                shutil.rmtree(old)
+              if os.path.isdir(old): shutil.rmtree(old)
             runs = runs[:50]
 
           with open(runs_path, 'w') as f:
             json.dump(runs, f, indent=2)
           PYEOF
 
-          # --- Render history pages from template ---
           TMPL=".github/templates/history.html"
           REPORT_DATE="${{ env.REPORT_DATE }}"
 
@@ -290,7 +288,6 @@ jobs:
               -e 's|%%DATA_FILE%%|sanity-runs.json|g' \
               "$TMPL" > gh-pages/sanity-history.html
 
-          # Only create these if they don't already exist (regression workflow owns them)
           [ -f gh-pages/regression-history.html ] || \
             sed -e 's|%%TITLE%%|Regression|g' \
                 -e 's|%%ICON%%|🧪|g' \
@@ -307,7 +304,6 @@ jobs:
                 -e 's|%%DATA_FILE%%|monthly-runs.json|g' \
                 "$TMPL" > gh-pages/monthly-history.html
 
-          # --- Render dashboard index from template ---
           sed "s|%%DATE%%|${REPORT_DATE}|g" \
               .github/templates/index.html > gh-pages/index.html
 

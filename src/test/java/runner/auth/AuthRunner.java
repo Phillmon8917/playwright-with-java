@@ -1,4 +1,4 @@
-package runner;
+package runner.auth;
 
 import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
@@ -16,7 +16,7 @@ import static io.cucumber.junit.platform.engine.Constants.SNIPPET_TYPE_PROPERTY_
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME,
         value = "pretty, html:target/cucumber-reports/auth-report.html, json:target/cucumber-reports/auth-report.json")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME,
-        value = "steps, hooks, context")
+        value = "steps, hooks.hooker, hooks.errors, context")
 @ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME,
         value = "@authentication")
 @ConfigurationParameter(key = SNIPPET_TYPE_PROPERTY_NAME,
