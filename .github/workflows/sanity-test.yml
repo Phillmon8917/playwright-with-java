@@ -115,11 +115,11 @@ jobs:
       - name: Run sanity tests
         id: run_tests
         run: |
+          set -o pipefail
           mvn test -Dsurefire.failIfNoSpecifiedTests=false \
             -Dskip.auth.tests=true \
             -Dgroups="${{ inputs.tag != '' && inputs.tag || 'sanity' }}" \
             | tee test-output.txt
-          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
 
       - name: Parse test results
         if: always()
@@ -135,6 +135,10 @@ jobs:
           echo "failures=$FAILURES" >> $GITHUB_OUTPUT
           echo "errors=$ERRORS"     >> $GITHUB_OUTPUT
           echo "skipped=$SKIPPED"   >> $GITHUB_OUTPUT
+          if [ "$FAILURES" -gt 0 ] || [ "$ERRORS" -gt 0 ]; then
+            echo "❌ Tests failed: $FAILURES failure(s), $ERRORS error(s)"
+            exit 1
+          fi
 
       - name: Write run summary
         if: always()
