@@ -13,16 +13,25 @@ public class AgentSignupSteps {
         this.context = context;
     }
 
+    /**
+     * Navigates to the agent signup page from the home page.
+     */
     @When("I navigate to the agent signup page")
     public void iNavigateToTheAgentSignupPage() {
         context.getHomePage().verifyNavigationToAgentSignupPage();
     }
 
+    /**
+     * Solves the security check question (answer already resolved in context).
+     */
     @When("I solve the security check question")
     public void iSolveTheSecurityCheckQuestion() {
         // Answer already resolved and stored in context by CommonSteps
     }
 
+    /**
+     * Fills the agent signup form with valid generated details.
+     */
     @When("I fill the agent signup form with valid details")
     public void iFillTheAgentSignupFormWithValidDetails() {
         String generatedPassword = FakerHelper.generatePassword(8);
@@ -39,6 +48,10 @@ public class AgentSignupSteps {
         ));
     }
 
+    /**
+     * Submits the agent signup form with an empty first name to test
+     * validation.
+     */
     @When("I submit the agent signup form with an empty first name")
     public void iSubmitTheAgentSignupFormWithAnEmptyFirstName() {
         context.getSignupPage().fillTheSignUpForm(new SignupOptions(
@@ -54,6 +67,9 @@ public class AgentSignupSteps {
         ));
     }
 
+    /**
+     * Submits the agent signup form with an empty last name to test validation.
+     */
     @When("I submit the agent signup form with an empty last name")
     public void iSubmitTheAgentSignupFormWithAnEmptyLastName() {
         context.getSignupPage().fillTheSignUpForm(new SignupOptions(
@@ -69,6 +85,9 @@ public class AgentSignupSteps {
         ));
     }
 
+    /**
+     * Submits the agent signup form with an empty email to test validation.
+     */
     @When("I submit the agent signup form with an empty email")
     public void iSubmitTheAgentSignupFormWithAnEmptyEmail() {
         context.getSignupPage().fillTheSignUpForm(new SignupOptions(
@@ -84,6 +103,9 @@ public class AgentSignupSteps {
         ));
     }
 
+    /**
+     * Submits the agent signup form with an empty password to test validation.
+     */
     @When("I submit the agent signup form with an empty password")
     public void iSubmitTheAgentSignupFormWithAnEmptyPassword() {
         context.getSignupPage().fillTheSignUpForm(new SignupOptions(
@@ -99,6 +121,10 @@ public class AgentSignupSteps {
         ));
     }
 
+    /**
+     * Submits the agent signup form with an empty confirm password to test
+     * validation.
+     */
     @When("I submit the agent signup form with an empty confirm password")
     public void iSubmitTheAgentSignupFormWithAnEmptyConfirmPassword() {
         context.getSignupPage().fillTheSignUpForm(new SignupOptions(

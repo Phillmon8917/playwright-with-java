@@ -1,4 +1,4 @@
-package hooks;
+package hooks.hooker;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,10 +12,13 @@ import com.microsoft.playwright.Playwright;
 
 import config.PlaywrightConfig;
 import context.TestContext;
+import hooks.errors.ErrorStore;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.qameta.allure.Allure;
+import io.qameta.allure.model.Status;
+import io.qameta.allure.model.StatusDetails;
 import pages.subPages.home.HomePage;
 import pages.subPages.login.LoginPage;
 import pages.subPages.signup.SignupPage;
@@ -35,8 +38,9 @@ public class Hooks {
     }
 
     /**
-     * Sets up the test environment before each scenario execution. Initializes
-     * Playwright, browser, and page objects.
+     * Sets up the test environment before each scenario. Initializes
+     * Playwright, browser, context, page, and page objects. Registers logging
+     * and clears error store.
      *
      * @param scenario the Cucumber scenario being executed
      */
@@ -44,6 +48,7 @@ public class Hooks {
     public void setUp(Scenario scenario) {
         long threadId = Thread.currentThread().getId();
         AllureLogAppender.registerThread(threadId);
+        ErrorStore.clear();
 
         LoggingUtil.info("Starting scenario: " + scenario.getName());
 
@@ -72,15 +77,19 @@ public class Hooks {
     }
 
     /**
-     * Cleans up the test environment after each scenario execution. Attaches
-     * screenshots, videos, and logs if the scenario failed.
+     * Tears down the test environment after each scenario. Handles failed
+     * scenarios, attaches screenshots/videos/logs, and cleans up resources.
      *
-     * @param scenario the Cucumber scenario that completed
+     * @param scenario the Cucumber scenario that finished
      */
     @After
     public void tearDown(Scenario scenario) {
         long threadId = Thread.currentThread().getId();
         boolean failed = scenario.isFailed();
+
+        if (failed) {
+            enforceRedFailure(scenario);
+        }
 
         attachScreenshot(scenario.getName());
 
@@ -100,6 +109,7 @@ public class Hooks {
 
         deleteDirectory(videoDir);
         TL_VIDEO_DIR.remove();
+        ErrorStore.clear();
 
         attachLogs(threadId);
 
@@ -107,9 +117,66 @@ public class Hooks {
     }
 
     /**
-     * Attaches a screenshot to the Allure report for the given scenario.
+     * Enforces a red (failed) status in Allure for scenarios that failed but
+     * weren't marked as such. Builds and sets error details in the test result.
      *
-     * @param scenarioName the name of the scenario
+     * @param scenario the failed scenario
+     */
+    private void enforceRedFailure(Scenario scenario) {
+        try {
+            Allure.getLifecycle().updateTestCase(testResult -> {
+                if (testResult.getStatus() != Status.FAILED) {
+                    String errorMessage = buildErrorMessage(scenario);
+                    LoggingUtil.error(errorMessage);
+                    testResult.setStatus(Status.FAILED);
+                    testResult.setStatusDetails(
+                            new StatusDetails()
+                                    .setMessage(errorMessage)
+                                    .setTrace(errorMessage)
+                    );
+                }
+            });
+        } catch (Exception e) {
+            LoggingUtil.error("Could not enforce red failure status: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Builds a detailed error message string for a failed scenario, including
+     * scenario details, tags, status, and error information from ErrorStore.
+     *
+     * @param scenario the failed scenario
+     * @return a formatted error message string
+     */
+    private String buildErrorMessage(Scenario scenario) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SCENARIO FAILED: ").append(scenario.getName()).append("\n");
+        sb.append("Tags          : ").append(scenario.getSourceTagNames()).append("\n");
+        sb.append("Status        : ").append(scenario.getStatus()).append("\n");
+
+        Throwable error = ErrorStore.get();
+        if (error != null) {
+            sb.append("Error Type    : ").append(error.getClass().getSimpleName()).append("\n");
+            sb.append("Message       : ").append(error.getMessage() != null ? error.getMessage() : "No message").append("\n");
+
+            if (error.getCause() != null) {
+                sb.append("Caused By     : ").append(error.getCause().getMessage()).append("\n");
+            }
+
+            StackTraceElement[] stack = error.getStackTrace();
+            if (stack.length > 0) {
+                sb.append("Location      : ").append(stack[0].toString()).append("\n");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Captures a full-page screenshot of the current page and attaches it to
+     * Allure.
+     *
+     * @param scenarioName the name of the scenario for the attachment
      */
     private void attachScreenshot(String scenarioName) {
         try {
@@ -126,9 +193,10 @@ public class Hooks {
     }
 
     /**
-     * Attaches a video recording to the Allure report if available.
+     * Finds and attaches the first .webm video file from the video directory to
+     * Allure.
      *
-     * @param videoDir the directory containing the video files
+     * @param videoDir the directory containing video files
      */
     private void attachVideo(Path videoDir) {
         try {
@@ -151,9 +219,9 @@ public class Hooks {
     }
 
     /**
-     * Attaches console logs to the Allure report for the given thread.
+     * Drains and attaches console logs for the given thread to Allure.
      *
-     * @param threadId the ID of the thread whose logs to attach
+     * @param threadId the thread ID to get logs for
      */
     private void attachLogs(long threadId) {
         try {
@@ -167,7 +235,7 @@ public class Hooks {
     }
 
     /**
-     * Deletes the specified directory and all its contents.
+     * Recursively deletes the specified directory and all its contents.
      *
      * @param dir the directory to delete
      */

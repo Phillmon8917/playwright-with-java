@@ -1,11 +1,14 @@
 package utils.faker;
 
-import com.github.javafaker.Faker;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FakerHelper
-{
+import com.github.javafaker.Faker;
+
+import utils.randomNumber.RandomNumberGeneratorUtil;
+
+public class FakerHelper {
+
     private static final Faker faker = new Faker();
 
     /**
@@ -26,7 +29,16 @@ public class FakerHelper
      * Generates a random email address.
      */
     public static String generateEmail() {
-        return faker.internet().emailAddress();
+        String fakerGeneratedEmail = faker.internet().emailAddress();
+        int atIndex = fakerGeneratedEmail.indexOf('@');
+        if (atIndex == -1) {
+            fakerGeneratedEmail = "user" + fakerGeneratedEmail + "@example.com";
+        }
+
+        String localPart = fakerGeneratedEmail.substring(0, atIndex);
+        String domainPart = fakerGeneratedEmail.substring(atIndex);
+
+        return localPart + RandomNumberGeneratorUtil.getRandomNumber(1, 999) + domainPart;
     }
 
     /**

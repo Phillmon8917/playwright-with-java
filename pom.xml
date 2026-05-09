@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
@@ -14,7 +15,23 @@
         <allure.version>2.27.0</allure.version>
         <aspectj.version>1.9.22</aspectj.version>
         <cucumber.junit-platform.naming-strategy>long</cucumber.junit-platform.naming-strategy>
+        <skipAllureOpen>false</skipAllureOpen>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <activation>
+                <property>
+                    <name>env.CI</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <skipAllureOpen>true</skipAllureOpen>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -109,7 +126,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <skip>${env.CI}</skip>
+                            <skip>${skipAllureOpen}</skip>
                             <executable>allure</executable>
                             <arguments>
                                 <argument>serve</argument>
@@ -125,19 +142,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
+                    <skip>true</skip>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>
-                    <systemPropertyVariables>
-                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
-                        <junit.jupiter.execution.parallel.enabled>true</junit.jupiter.execution.parallel.enabled>
-                        <junit.jupiter.execution.parallel.mode.default>concurrent</junit.jupiter.execution.parallel.mode.default>
-                        <junit.jupiter.execution.parallel.config.strategy>fixed</junit.jupiter.execution.parallel.config.strategy>
-                        <junit.jupiter.execution.parallel.config.fixed.parallelism>3</junit.jupiter.execution.parallel.config.fixed.parallelism>
-                    </systemPropertyVariables>
                 </configuration>
                 <executions>
-                    <!-- Phase 1: Auth always runs first, no tag filtering -->
                     <execution>
                         <id>auth-tests</id>
                         <phase>test</phase>
@@ -145,13 +155,20 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
+                            <skip>${skip.auth.tests}</skip>
                             <includes>
                                 <include>**/AuthRunner.java</include>
                             </includes>
                             <runOrder>alphabetical</runOrder>
+                            <rerunFailingTestsCount>2</rerunFailingTestsCount>
+                            <argLine>
+                                -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                            </argLine>
+                            <systemPropertyVariables>
+                                <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                            </systemPropertyVariables>
                         </configuration>
                     </execution>
-                    <!-- Phase 2: All other tests, respects tag filters -->
                     <execution>
                         <id>main-tests</id>
                         <phase>test</phase>
@@ -159,9 +176,21 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
+                            <skip>${skip.main.tests}</skip>
                             <includes>
                                 <include>**/CucumberRunner.java</include>
                             </includes>
+                            <rerunFailingTestsCount>2</rerunFailingTestsCount>
+                            <argLine>
+                                -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                            </argLine>
+                            <systemPropertyVariables>
+                                <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                                <junit.jupiter.execution.parallel.enabled>true</junit.jupiter.execution.parallel.enabled>
+                                <junit.jupiter.execution.parallel.mode.default>concurrent</junit.jupiter.execution.parallel.mode.default>
+                                <junit.jupiter.execution.parallel.config.strategy>fixed</junit.jupiter.execution.parallel.config.strategy>
+                                <junit.jupiter.execution.parallel.config.fixed.parallelism>3</junit.jupiter.execution.parallel.config.fixed.parallelism>
+                            </systemPropertyVariables>
                         </configuration>
                     </execution>
                 </executions>

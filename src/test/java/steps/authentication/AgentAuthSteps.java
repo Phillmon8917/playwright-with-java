@@ -19,17 +19,27 @@ public class AgentAuthSteps {
         this.context = context;
     }
 
+    /**
+     * Clears the agent storage state file.
+     */
     @When("the agent storage state is cleared")
     public void theAgentStorageStateIsCleared() {
         StorageStateManager.deleteStorage("agent");
     }
 
+    /**
+     * Logs in using agent credentials retrieved from the credentials provider.
+     */
     @When("I log in with agent credentials")
     public void iLogInWithAgentCredentials() {
         Credentials credentials = CredentialsProvider.getCredentials(CredentialsOptions.AGENT);
         context.getLoginPage().login(credentials.getUsername(), credentials.getPassword(), true);
     }
 
+    /**
+     * Saves the current browser context's storage state to the agent storage
+     * file.
+     */
     @Then("the agent session should be saved to storage")
     public void theAgentSessionShouldBeSavedToStorage() {
         String storagePath = "storage/agent.json";

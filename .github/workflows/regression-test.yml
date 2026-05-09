@@ -77,12 +77,9 @@ jobs:
       AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
       AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
       BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
-      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout ||
-        vars.ACTION_TIMEOUT }}
-      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' &&
-        inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
-      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout ||
-        vars.TEST_TIMEOUT }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
 
     steps:
       - name: Checkout repo
@@ -98,11 +95,10 @@ jobs:
           cache: maven
 
       - name: Install Playwright browsers
-        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI
-          -Dexec.args="install --with-deps"
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
 
       - name: Run authentication
-        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="authentication"
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dincludes="**/AuthRunner.java" -Dskip.main.tests=true
 
       - name: Upload storage state
         uses: actions/upload-artifact@v4
@@ -112,12 +108,12 @@ jobs:
           retention-days: 1
 
   test-shard:
-    needs: [ resolve-branch, authenticate ]
+    needs: [resolve-branch, authenticate]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shard: [ 1, 2, 3, 4, 5, 6 ]
+        shard: [1, 2, 3, 4, 5, 6]
     env:
       CI: true
       DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
@@ -131,12 +127,9 @@ jobs:
       AGENT_USERNAME: ${{ secrets.AGENT_USERNAME }}
       AGENT_PASSWORD: ${{ secrets.AGENT_PASSWORD }}
       BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || vars.BASE_URL }}
-      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout ||
-        vars.ACTION_TIMEOUT }}
-      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' &&
-        inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
-      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout ||
-        vars.TEST_TIMEOUT }}
+      ACTION_TIMEOUT: ${{ inputs.action_timeout != '' && inputs.action_timeout || vars.ACTION_TIMEOUT }}
+      NAVIGATION_TIMEOUT: ${{ inputs.navigation_timeout != '' && inputs.navigation_timeout || vars.NAVIGATION_TIMEOUT }}
+      TEST_TIMEOUT: ${{ inputs.test_timeout != '' && inputs.test_timeout || vars.TEST_TIMEOUT }}
 
     steps:
       - name: Checkout repo
@@ -152,8 +145,7 @@ jobs:
           cache: maven
 
       - name: Install Playwright browsers
-        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI
-          -Dexec.args="install --with-deps"
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
 
       - name: Download storage state
         uses: actions/download-artifact@v4
@@ -164,10 +156,11 @@ jobs:
       - name: Run shard ${{ matrix.shard }}
         id: run_tests
         run: |
+          set -o pipefail
           mvn test -Dsurefire.failIfNoSpecifiedTests=false \
+            -Dskip.auth.tests=true \
             -Dgroups="${{ inputs.tag != '' && inputs.tag || 'regression' }} & shard${{ matrix.shard }}" \
             | tee shard-output.txt
-          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
 
       - name: Parse shard results
         if: always()
@@ -183,11 +176,15 @@ jobs:
           echo "failures=$FAILURES" >> $GITHUB_OUTPUT
           echo "errors=$ERRORS"     >> $GITHUB_OUTPUT
           echo "skipped=$SKIPPED"   >> $GITHUB_OUTPUT
+          if [ "$FAILURES" -gt 0 ] || [ "$ERRORS" -gt 0 ]; then
+            echo "❌ Shard ${{ matrix.shard }} failed: $FAILURES failure(s), $ERRORS error(s)"
+            exit 1
+          fi
 
       - name: Write shard summary
         if: always()
         run: |
-          STATUS="${{ steps.run_tests.outputs.exit_code == '0' && '✅ Passed' || '❌ Failed' }}"
+          STATUS="${{ steps.run_tests.outcome == 'success' && '✅ Passed' || '❌ Failed' }}"
           cat >> $GITHUB_STEP_SUMMARY << EOF
           ## Shard ${{ matrix.shard }} Summary
           | Field | Value |
@@ -222,7 +219,7 @@ jobs:
           retention-days: 1
 
   build-report:
-    needs: [ resolve-branch, test-shard ]
+    needs: [resolve-branch, test-shard]
     runs-on: ubuntu-latest
     if: always()
     env:
@@ -268,6 +265,25 @@ jobs:
       - name: Build monthly report
         run: mvn exec:java -Dexec.mainClass=report.BuildReport
 
+      - name: Load monthly totals
+        if: always()
+        id: monthly
+        run: |
+          TESTS=$(python3    -c "import json; d=json.load(open('src/dist/monthly-totals.json')); print(d['tests'])")
+          PASSED=$(python3   -c "import json; d=json.load(open('src/dist/monthly-totals.json')); print(d['passed'])")
+          FAILURES=$(python3 -c "import json; d=json.load(open('src/dist/monthly-totals.json')); print(d['failures'])")
+          ERRORS=$(python3   -c "import json; d=json.load(open('src/dist/monthly-totals.json')); print(d['errors'])")
+          SKIPPED=$(python3  -c "import json; d=json.load(open('src/dist/monthly-totals.json')); print(d['skipped'])")
+          PASS_RATE=$(python3 -c "import json; d=json.load(open('src/dist/monthly-totals.json')); print(d['passRate'])")
+          RUNS=$(python3     -c "import json; d=json.load(open('src/dist/monthly-totals.json')); print(d['runs'])")
+          echo "tests=$TESTS"         >> $GITHUB_OUTPUT
+          echo "passed=$PASSED"       >> $GITHUB_OUTPUT
+          echo "failures=$FAILURES"   >> $GITHUB_OUTPUT
+          echo "errors=$ERRORS"       >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED"     >> $GITHUB_OUTPUT
+          echo "pass_rate=$PASS_RATE" >> $GITHUB_OUTPUT
+          echo "runs=$RUNS"           >> $GITHUB_OUTPUT
+
       - name: Aggregate shard totals
         if: always()
         id: aggregate
@@ -281,38 +297,48 @@ jobs:
             TOTAL_ERRORS=$((TOTAL_ERRORS + errors))
             TOTAL_SKIPPED=$((TOTAL_SKIPPED + skipped))
           done
-          echo "tests=$TOTAL_TESTS"         >> $GITHUB_OUTPUT
-          echo "passed=$TOTAL_PASSED"       >> $GITHUB_OUTPUT
-          echo "failures=$TOTAL_FAILURES"   >> $GITHUB_OUTPUT
-          echo "errors=$TOTAL_ERRORS"       >> $GITHUB_OUTPUT
-          echo "skipped=$TOTAL_SKIPPED"     >> $GITHUB_OUTPUT
+          echo "tests=$TOTAL_TESTS"       >> $GITHUB_OUTPUT
+          echo "passed=$TOTAL_PASSED"     >> $GITHUB_OUTPUT
+          echo "failures=$TOTAL_FAILURES" >> $GITHUB_OUTPUT
+          echo "errors=$TOTAL_ERRORS"     >> $GITHUB_OUTPUT
+          echo "skipped=$TOTAL_SKIPPED"   >> $GITHUB_OUTPUT
+
+      - name: Fail build on shard errors
+        if: always()
+        run: |
+          FAILURES=${{ steps.aggregate.outputs.failures }}
+          ERRORS=${{ steps.aggregate.outputs.errors }}
+          if [ "$FAILURES" -gt 0 ] || [ "$ERRORS" -gt 0 ]; then
+            echo "❌ Regression failed: $FAILURES failure(s), $ERRORS error(s) across all shards"
+            exit 1
+          fi
 
       - name: Set run metadata
         if: always()
         run: |
-          RUN_ID="${{ github.run_id }}"
           TESTS=${{ steps.aggregate.outputs.tests }}
           PASSED=${{ steps.aggregate.outputs.passed }}
           FAILURES=${{ steps.aggregate.outputs.failures }}
           ERRORS=${{ steps.aggregate.outputs.errors }}
           SKIPPED=${{ steps.aggregate.outputs.skipped }}
+          EXECUTED=$((TESTS - SKIPPED))
           PASS_RATE=0
-          [ "$TESTS" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $TESTS" | bc)
+          [ "$EXECUTED" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $EXECUTED" | bc)
           [ "$FAILURES" -eq 0 ] && [ "$ERRORS" -eq 0 ] && STATUS="passed" || STATUS="failed"
 
-          echo "RUN_ID=$RUN_ID"                                        >> $GITHUB_ENV
-          echo "RUN_DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')"            >> $GITHUB_ENV
-          echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')"         >> $GITHUB_ENV
-          echo "META_BRANCH=${{ needs.resolve-branch.outputs.branch }}" >> $GITHUB_ENV
-          echo "META_TAG=${{ inputs.tag != '' && inputs.tag || 'regression' }}" >> $GITHUB_ENV
-          echo "META_TRIGGER=${{ github.event_name }}"                 >> $GITHUB_ENV
-          echo "META_TESTS=$TESTS"                                     >> $GITHUB_ENV
-          echo "META_PASSED=$PASSED"                                   >> $GITHUB_ENV
-          echo "META_FAILURES=$FAILURES"                               >> $GITHUB_ENV
-          echo "META_ERRORS=$ERRORS"                                   >> $GITHUB_ENV
-          echo "META_SKIPPED=$SKIPPED"                                 >> $GITHUB_ENV
-          echo "META_STATUS=$STATUS"                                   >> $GITHUB_ENV
-          echo "META_PASS_RATE=$PASS_RATE"                             >> $GITHUB_ENV
+          echo "RUN_ID=${{ github.run_id }}"                                            >> $GITHUB_ENV
+          echo "RUN_DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')"                             >> $GITHUB_ENV
+          echo "REPORT_DATE=$(date -u '+%Y-%m-%d %H:%M UTC')"                          >> $GITHUB_ENV
+          echo "META_BRANCH=${{ needs.resolve-branch.outputs.branch }}"                 >> $GITHUB_ENV
+          echo "META_TAG=${{ inputs.tag != '' && inputs.tag || 'regression' }}"         >> $GITHUB_ENV
+          echo "META_TRIGGER=${{ github.event_name }}"                                  >> $GITHUB_ENV
+          echo "META_TESTS=$TESTS"                                                      >> $GITHUB_ENV
+          echo "META_PASSED=$PASSED"                                                    >> $GITHUB_ENV
+          echo "META_FAILURES=$FAILURES"                                                >> $GITHUB_ENV
+          echo "META_ERRORS=$ERRORS"                                                    >> $GITHUB_ENV
+          echo "META_SKIPPED=$SKIPPED"                                                  >> $GITHUB_ENV
+          echo "META_STATUS=$STATUS"                                                    >> $GITHUB_ENV
+          echo "META_PASS_RATE=$PASS_RATE"                                              >> $GITHUB_ENV
 
       - name: Write final run summary
         if: always()
@@ -376,7 +402,6 @@ jobs:
         run: |
           RUN_ID="${{ env.RUN_ID }}"
 
-          # --- Copy Allure and monthly report artefacts ---
           mkdir -p "gh-pages/regression-reports/${RUN_ID}"
           cp -r target/site/allure-maven-plugin/. "gh-pages/regression-reports/${RUN_ID}/"
 
@@ -389,12 +414,10 @@ jobs:
           mkdir -p gh-pages/monthly-report
           cp src/dist/report.html gh-pages/monthly-report/index.html
 
-          # --- Initialise JSON files if absent ---
           [ -f gh-pages/regression-runs.json ] || echo "[]" > gh-pages/regression-runs.json
           [ -f gh-pages/monthly-runs.json    ] || echo "[]" > gh-pages/monthly-runs.json
           [ -f gh-pages/sanity-runs.json     ] || echo "[]" > gh-pages/sanity-runs.json
 
-          # --- Update run history JSON files ---
           python3 - << PYEOF
           import json, os, shutil
 
@@ -404,36 +427,52 @@ jobs:
           tag      = os.environ['META_TAG']
           trigger  = os.environ['META_TRIGGER']
           status   = os.environ['META_STATUS']
-          tests    = int(os.environ['META_TESTS'])
-          passed   = int(os.environ['META_PASSED'])
-          failures = int(os.environ['META_FAILURES'])
-          errors   = int(os.environ['META_ERRORS'])
-          skipped  = int(os.environ['META_SKIPPED'])
-          pass_rate = os.environ['META_PASS_RATE']
 
-          base = {'id':run_id,'date':run_date,'branch':branch,'tag':tag,'trigger':trigger,
-                  'status':status,'tests':tests,'passed':passed,'failures':failures,
-                  'errors':errors,'skipped':skipped,'passRate':pass_rate}
+          with open('src/dist/monthly-totals.json') as f:
+            t = json.load(f)
 
-          for json_path, report_prefix in [
-            ('gh-pages/regression-runs.json', 'regression-reports'),
-            ('gh-pages/monthly-runs.json',    'monthly-reports'),
-          ]:
-            with open(json_path) as f:
-              runs = json.load(f)
-            entry = {**base, 'reportPath': f'{report_prefix}/{run_id}/index.html'}
-            runs.insert(0, entry)
-            if len(runs) > 50:
-              for r in runs[50:]:
-                old = 'gh-pages/' + r['reportPath'].replace('/index.html','')
-                if os.path.isdir(old):
-                  shutil.rmtree(old)
-              runs = runs[:50]
-            with open(json_path, 'w') as f:
-              json.dump(runs, f, indent=2)
+          monthly_status = 'passed' if int(t['failures']) == 0 and int(t['errors']) == 0 else 'failed'
+
+          with open('gh-pages/regression-runs.json') as f:
+            reg_runs = json.load(f)
+          reg_runs.insert(0, {
+            'id': run_id, 'date': run_date, 'branch': branch, 'tag': tag,
+            'trigger': trigger, 'status': status,
+            'tests': int(os.environ['META_TESTS']),
+            'passed': int(os.environ['META_PASSED']),
+            'failures': int(os.environ['META_FAILURES']),
+            'errors': int(os.environ['META_ERRORS']),
+            'skipped': int(os.environ['META_SKIPPED']),
+            'passRate': os.environ['META_PASS_RATE'],
+            'reportPath': f'regression-reports/{run_id}/index.html'
+          })
+          if len(reg_runs) > 50:
+            for r in reg_runs[50:]:
+              old = 'gh-pages/' + r['reportPath'].replace('/index.html','')
+              if os.path.isdir(old): shutil.rmtree(old)
+            reg_runs = reg_runs[:50]
+          with open('gh-pages/regression-runs.json', 'w') as f:
+            json.dump(reg_runs, f, indent=2)
+
+          with open('gh-pages/monthly-runs.json') as f:
+            monthly = json.load(f)
+          monthly.insert(0, {
+            'id': run_id, 'date': run_date, 'branch': branch, 'tag': tag,
+            'trigger': trigger, 'status': monthly_status,
+            'tests': t['tests'], 'passed': t['passed'],
+            'failures': t['failures'], 'errors': t['errors'],
+            'skipped': t['skipped'], 'passRate': t['passRate'],
+            'reportPath': f'monthly-reports/{run_id}/index.html'
+          })
+          if len(monthly) > 50:
+            for r in monthly[50:]:
+              old = 'gh-pages/' + r['reportPath'].replace('/index.html','')
+              if os.path.isdir(old): shutil.rmtree(old)
+            monthly = monthly[:50]
+          with open('gh-pages/monthly-runs.json', 'w') as f:
+            json.dump(monthly, f, indent=2)
           PYEOF
 
-          # --- Render history pages from template ---
           TMPL=".github/templates/history.html"
           REPORT_DATE="${{ env.REPORT_DATE }}"
 
@@ -451,7 +490,6 @@ jobs:
               -e 's|%%DATA_FILE%%|monthly-runs.json|g' \
               "$TMPL" > gh-pages/monthly-history.html
 
-          # --- Render dashboard index from template ---
           sed "s|%%DATE%%|${REPORT_DATE}|g" \
               .github/templates/index.html > gh-pages/index.html
 

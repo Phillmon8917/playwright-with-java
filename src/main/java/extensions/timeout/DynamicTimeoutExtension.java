@@ -1,6 +1,7 @@
-package extensions;
+package extensions.timeout;
 
 import config.PlaywrightConfig;
+import extensions.failure.FailureTracker;
 import org.junit.jupiter.api.extension.*;
 import org.opentest4j.AssertionFailedError;
 import utils.logger.AllureLogAppender;
