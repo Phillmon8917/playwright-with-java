@@ -1,4 +1,4 @@
-package extensions;
+package extensions.failure;
 
 public class FailureTracker {
 

@@ -5,6 +5,11 @@ on:
     branches:
       - "**"
     types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - develop
+      - qa
+      - main
 
 jobs:
   branch-validation:
@@ -13,8 +18,11 @@ jobs:
     steps:
       - name: Checkout PR
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate PR branches
+        if: github.event_name == 'pull_request'
         shell: bash
         run: |
           echo "Starting PR branch validation..."
@@ -50,3 +58,15 @@ jobs:
           fi
 
           echo "✅ PR branch rules ran successfully."
+
+      - name: Check branch is up to date
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          BEHIND=$(git rev-list --count HEAD..origin/${{ github.event.pull_request.base.ref }})
+          if [ "$BEHIND" -gt 0 ]; then
+            echo "❌ ERROR: This branch is $BEHIND commit(s) behind '${{ github.event.pull_request.base.ref }}'. Update your branch before merging."
+            exit 1
+          fi
+          echo "✅ Branch is up to date with '${{ github.event.pull_request.base.ref }}'."

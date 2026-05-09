@@ -1,19 +1,10 @@
-[2026-05-05 12:13:51] [INFO] Starting scenario: All quick search tabs are visible
-[2026-05-05 12:14:05] [WARN] [ENV] Missing key → CI
-[2026-05-05 12:14:06] [INFO] [ENV] Found in .env → BASE_URL
-[2026-05-05 12:14:06] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
-[2026-05-05 12:14:06] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
-[2026-05-05 12:14:19] [WARN] [ENV] Missing key → CI
-[2026-05-05 12:14:19] [INFO] loadThePage - Loader disappeared (hidden or detached)
-[2026-05-05 12:14:20] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Visa Quick Search Tab
-[2026-05-05 12:14:20] [INFO] verifyAllQuickSearchTabsAreVisible - Check Visa Search Button is visible
-[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Tours Quick Search Tab
-[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Tours Search Button is visible
-[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Cars Quick Search Tab
-[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Cars Search Button is visible
-[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Flights Quick Search Tab
-[2026-05-05 12:14:21] [INFO] verifyAllQuickSearchTabsAreVisible - Flights Search Button is visible
-[2026-05-05 12:14:22] [INFO] verifyAllQuickSearchTabsAreVisible - Successfully clicked Stays Quick Search Tab
-[2026-05-05 12:14:22] [INFO] verifyAllQuickSearchTabsAreVisible - Stays Search Button is visible
-[2026-05-05 12:14:22] [INFO] Assertion Passed - All quick search tabs are visible
-[2026-05-05 12:14:24] [INFO] Scenario finished: All quick search tabs are visible | Status: PASSED
+[2026-05-09 13:06:29] [INFO] Starting scenario: Home page loads successfully
+[2026-05-09 13:06:38] [WARN] [ENV] Missing key → CI
+[2026-05-09 13:06:38] [INFO] [ENV] Found in .env → BASE_URL
+[2026-05-09 13:06:39] [INFO] [ENV] Found in .env → ACTION_TIMEOUT
+[2026-05-09 13:06:39] [INFO] [ENV] Found in .env → NAVIGATION_TIMEOUT
+[2026-05-09 13:06:55] [WARN] [ENV] Missing key → CI
+[2026-05-09 13:06:55] [INFO] loadThePage - Loader disappeared (hidden or detached)
+[2026-05-09 13:06:55] [INFO] verifyPageLoaded - Logo is visible
+[2026-05-09 13:06:55] [INFO] Assertion Passed - Home Page is loaded
+[2026-05-09 13:06:59] [INFO] Scenario finished: Home page loads successfully | Status: PASSED
