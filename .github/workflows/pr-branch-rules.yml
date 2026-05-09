@@ -29,6 +29,11 @@ jobs:
 
           fail() { echo "❌ ERROR: $1"; exit 1; }
 
+          if [[ "$SOURCE_BRANCH" =~ ^sync/ ]]; then
+            echo "✅ Sync branch detected. Skipping branch flow validation."
+            exit 0
+          fi
+
           if [[ "$SOURCE_BRANCH" != "develop" && "$SOURCE_BRANCH" != "qa" && "$SOURCE_BRANCH" != "main" ]]; then
             if [[ ! "$SOURCE_BRANCH" =~ ^(feature|bugfix|hotfix)/ ]]; then
               fail "Branch '$SOURCE_BRANCH' is invalid. New branches must start with 'feature/', 'bugfix/', or 'hotfix/'."
