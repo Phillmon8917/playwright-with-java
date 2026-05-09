@@ -147,8 +147,9 @@ jobs:
           FAILURES=${{ steps.parse.outputs.failures }}
           ERRORS=${{ steps.parse.outputs.errors }}
           SKIPPED=${{ steps.parse.outputs.skipped }}
+          EXECUTED=$((TESTS - SKIPPED))
           PASS_RATE=0
-          [ "$TESTS" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $TESTS" | bc)
+          [ "$EXECUTED" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $EXECUTED" | bc)
           [ "$FAILURES" -eq 0 ] && [ "$ERRORS" -eq 0 ] && OVERALL="✅ All Passed" || OVERALL="❌ Some Failed"
 
           PR_LINK=""
@@ -195,8 +196,11 @@ jobs:
           FAILURES=${{ steps.parse.outputs.failures }}
           ERRORS=${{ steps.parse.outputs.errors }}
           SKIPPED=${{ steps.parse.outputs.skipped }}
+          # Pass rate denominator excludes skipped — they did not run
+          EXECUTED=$((TESTS - SKIPPED))
           PASS_RATE=0
-          [ "$TESTS" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $TESTS" | bc)
+          [ "$EXECUTED" -gt 0 ] && PASS_RATE=$(echo "scale=1; $PASSED * 100 / $EXECUTED" | bc)
+          # Broken/timeout tests surface as ERRORS in Surefire — treat as failures
           [ "$FAILURES" -eq 0 ] && [ "$ERRORS" -eq 0 ] && STATUS="passed" || STATUS="failed"
 
           echo "RUN_ID=${{ github.run_id }}"                                    >> $GITHUB_ENV
