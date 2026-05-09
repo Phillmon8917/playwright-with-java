@@ -98,7 +98,7 @@ jobs:
         run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
 
       - name: Run authentication
-        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dgroups="authentication"
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false -Dincludes="**/AuthRunner.java" -Dskip.main.tests=true
 
       - name: Upload storage state
         uses: actions/upload-artifact@v4
@@ -108,12 +108,12 @@ jobs:
           retention-days: 1
 
   test-shard:
-    needs: [ resolve-branch, authenticate ]
+    needs: [resolve-branch, authenticate]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shard: [ 1, 2, 3, 4, 5, 6 ]
+        shard: [1, 2, 3, 4, 5, 6]
     env:
       CI: true
       DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
@@ -157,6 +157,7 @@ jobs:
         id: run_tests
         run: |
           mvn test -Dsurefire.failIfNoSpecifiedTests=false \
+            -Dskip.auth.tests=true \
             -Dgroups="${{ inputs.tag != '' && inputs.tag || 'regression' }} & shard${{ matrix.shard }}" \
             | tee shard-output.txt
           echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
@@ -214,7 +215,7 @@ jobs:
           retention-days: 1
 
   build-report:
-    needs: [ resolve-branch, test-shard ]
+    needs: [resolve-branch, test-shard]
     runs-on: ubuntu-latest
     if: always()
     env:

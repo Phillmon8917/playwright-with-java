@@ -146,13 +146,6 @@
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>
-                    <systemPropertyVariables>
-                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
-                        <junit.jupiter.execution.parallel.enabled>true</junit.jupiter.execution.parallel.enabled>
-                        <junit.jupiter.execution.parallel.mode.default>concurrent</junit.jupiter.execution.parallel.mode.default>
-                        <junit.jupiter.execution.parallel.config.strategy>fixed</junit.jupiter.execution.parallel.config.strategy>
-                        <junit.jupiter.execution.parallel.config.fixed.parallelism>3</junit.jupiter.execution.parallel.config.fixed.parallelism>
-                    </systemPropertyVariables>
                 </configuration>
                 <executions>
                     <execution>
@@ -162,7 +155,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <skip>false</skip>
+                            <skip>${skip.auth.tests}</skip>
                             <includes>
                                 <include>**/AuthRunner.java</include>
                             </includes>
@@ -183,7 +176,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <skip>false</skip>
+                            <skip>${skip.main.tests}</skip>
                             <includes>
                                 <include>**/CucumberRunner.java</include>
                             </includes>
