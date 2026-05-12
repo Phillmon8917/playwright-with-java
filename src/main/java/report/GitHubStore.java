@@ -59,9 +59,6 @@ public class GitHubStore {
     /**
      * Builds the authenticated HTTP request headers required for GitHub API
      * access.
-     * <p>
-     * Throws {@link IllegalStateException} when {@code DATA_REPO_TOKEN} has not
-     * been set, so callers receive a clear error instead of a silent 401.
      *
      * @return an immutable map of header name-to-value pairs for GitHub API
      * calls
@@ -69,8 +66,7 @@ public class GitHubStore {
      */
     private static Map<String, String> headers() {
         if (TOKEN.isBlank()) {
-            throw new IllegalStateException(
-                    "[github-store] DATA_REPO_TOKEN is not set");
+            throw new IllegalStateException("[github-store] DATA_REPO_TOKEN is not set");
         }
         return Map.of(
                 "Authorization", "Bearer " + TOKEN,
@@ -94,11 +90,6 @@ public class GitHubStore {
      * A pairing of a {@link MonthlyStore} with the blob SHA returned by the
      * GitHub Contents API.
      *
-     * <p>
-     * The SHA must be supplied on any subsequent PUT to the same file so that
-     * GitHub can detect concurrent modifications and return a 409 when the file
-     * has changed since it was last read.
-     *
      * @param store the deserialized monthly store
      * @param sha the current blob SHA of the file, or {@code null} when the
      * file does not yet exist in the repository
@@ -109,16 +100,11 @@ public class GitHubStore {
 
     /**
      * Loads a monthly store and its current blob SHA from the GitHub data
-     * repository.
-     *
-     * <p>
-     * When no file exists for the given month a new, empty {@link MonthlyStore}
-     * is returned with a {@code null} SHA so that the first write will create
-     * the file rather than update it.
+     * repository. Returns an empty store when the file does not yet exist.
      *
      * @param month the month key in {@code yyyy-MM} format
      * @return the loaded {@link StoreWithSha}, or an empty store when the file
-     * does not yet exist
+     * does not exist
      * @throws Exception if the file cannot be fetched or its content cannot be
      * parsed
      */
@@ -145,17 +131,38 @@ public class GitHubStore {
     }
 
     /**
+     * Loads a monthly store filtered to only runs of the given type.
+     * <p>
+     * Runs whose {@code runType} is {@code null} or blank are treated as
+     * {@code "monthly"} for backwards-compatibility with data written before
+     * the {@code runType} field was introduced.
+     *
+     * @param month the month key in {@code yyyy-MM} format
+     * @param runType the run type to keep — all other run types are excluded
+     * @return a {@link MonthlyStore} containing only the matching runs
+     * @throws Exception if the file cannot be fetched or parsed
+     */
+    public static MonthlyStore loadStoreFiltered(String month, String runType) throws Exception {
+        MonthlyStore full = loadStore(month).store();
+        List<RunResult> filtered = full.runs().stream()
+                .filter(r -> {
+                    String t = r.runType();
+                    // Runs written before runType was added default to "monthly".
+                    String effective = (t == null || t.isBlank()) ? MonthlyReporter.TYPE_MONTHLY : t;
+                    return effective.equals(runType);
+                })
+                .toList();
+        LoggingUtil.info("[github-store] " + month + ".json filtered to runType='"
+                + runType + "' — " + filtered.size() + " of " + full.runs().size() + " runs kept");
+        return new MonthlyStore(month, filtered);
+    }
+
+    /**
      * Writes a monthly store to the GitHub data repository.
      *
-     * <p>
-     * Supplies the given {@code sha} in the PUT body so that GitHub can reject
-     * the write with a 409 when a concurrent shard has already modified the
-     * file. Callers that need conflict recovery should use
-     * {@link #appendRun(RunResult)}, which wraps this method in a retry loop.
-     *
      * @param store the monthly store to serialize and upload
-     * @param sha the current blob SHA when updating an existing file, or
-     * {@code null} when creating a new file
+     * @param sha the current blob SHA when updating, or {@code null} when
+     * creating
      * @throws Exception if the store cannot be serialized or the PUT request
      * fails
      */
@@ -182,17 +189,11 @@ public class GitHubStore {
 
     /**
      * Appends a run result to the monthly store in the GitHub data repository.
-     *
-     * <p>
-     * Uses an optimistic-concurrency retry loop to handle the case where two
-     * parallel CI shards attempt to write at the same time. On a 409 conflict
-     * the method re-fetches the latest file and its up-to-date SHA, checks
-     * whether the run was already written by a concurrent shard, and retries
-     * the PUT with exponential back-off up to {@value #MAX_RETRIES} times.
+     * Uses an optimistic-concurrency retry loop to handle parallel CI shards.
      *
      * @param run the run result to append to the monthly store
      * @throws Exception if the run cannot be persisted after all retries are
-     * exhausted, or if a non-conflict error occurs
+     * exhausted
      */
     public static void appendRun(RunResult run) throws Exception {
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -234,15 +235,11 @@ public class GitHubStore {
     }
 
     /**
-     * A bundle of monthly store data used for report generation, containing
-     * both the previous month's completed data and the current month's
-     * in-progress data.
+     * Bundle of monthly store data used for report generation.
      *
-     * @param reportMonth the month key in {@code yyyy-MM} format for the report
-     * period (previous month)
+     * @param reportMonth the month key for the report period (previous month)
      * @param reportStore the {@link MonthlyStore} for the report period
-     * @param currentMonth the month key in {@code yyyy-MM} format for the
-     * current month
+     * @param currentMonth the month key for the current month
      * @param currentStore the {@link MonthlyStore} for the current month
      */
     public record ReportData(String reportMonth, MonthlyStore reportStore,
@@ -251,14 +248,13 @@ public class GitHubStore {
     }
 
     /**
-     * Loads the previous month and the current month report data from the
-     * GitHub data repository.
-     *
+     * Loads report data for the previous and current months, filtered to
+     * {@code "monthly"} runs only.
      * <p>
-     * The previous month is used as the primary report period while the current
-     * month provides an in-progress view for trend calculations.
+     * Regression runs stored in the same JSON files are excluded here so the
+     * monthly report never shows regression data.
      *
-     * @return a {@link ReportData} bundle containing both monthly stores
+     * @return a {@link ReportData} bundle containing only monthly-typed runs
      * @throws Exception if either monthly file cannot be fetched or parsed
      */
     public static ReportData loadReportData() throws Exception {
@@ -271,25 +267,21 @@ public class GitHubStore {
         String reportMonth = String.format("%d-%02d",
                 prev.get(Calendar.YEAR), prev.get(Calendar.MONTH) + 1);
 
-        LoggingUtil.info("[github-store] Loading report data — reportMonth: "
+        LoggingUtil.info("[github-store] Loading monthly report data — reportMonth: "
                 + reportMonth + ", currentMonth: " + currentMonth);
 
-        MonthlyStore reportStore = loadStore(reportMonth).store();
-        MonthlyStore currentStore = loadStore(currentMonth).store();
+        // Filter to monthly runs only — regression runs are excluded.
+        MonthlyStore reportStore = loadStoreFiltered(reportMonth, MonthlyReporter.TYPE_MONTHLY);
+        MonthlyStore currentStore = loadStoreFiltered(currentMonth, MonthlyReporter.TYPE_MONTHLY);
 
-        LoggingUtil.info("[github-store] reportStore runs: " + reportStore.runs().size()
-                + ", currentStore runs: " + currentStore.runs().size());
+        LoggingUtil.info("[github-store] reportStore monthly runs: " + reportStore.runs().size()
+                + ", currentStore monthly runs: " + currentStore.runs().size());
 
         return new ReportData(reportMonth, reportStore, currentMonth, currentStore);
     }
 
     /**
      * Loads the set of known test identifiers from the GitHub data repository.
-     *
-     * <p>
-     * When the file does not yet exist all tests will be treated as new on the
-     * first run, and the file will be created by
-     * {@link #saveKnownTestIds(Set)}.
      *
      * @return the set of known test identifiers, or an empty set when the file
      * does not exist
@@ -320,27 +312,18 @@ public class GitHubStore {
 
     /**
      * Saves the supplied set of known test identifiers to the GitHub data
-     * repository.
-     *
-     * <p>
-     * Uses an optimistic-concurrency retry loop identical to the one used by
-     * {@link #appendRun(RunResult)}. On each attempt the latest blob SHA is
-     * re-fetched before the PUT so that a 409 caused by a concurrent shard
-     * writing the same file is resolved by retrying with the up-to-date SHA.
-     * Back-off delays double on every failed attempt up to
-     * {@value #MAX_RETRIES} retries.
+     * repository. Uses an optimistic-concurrency retry loop to handle parallel
+     * CI shards.
      *
      * @param ids the complete set of test identifiers to persist
-     * @throws Exception if the identifiers cannot be serialized or uploaded
-     * after all retries are exhausted
+     * @throws Exception if the identifiers cannot be uploaded after all retries
+     * are exhausted
      */
     public static void saveKnownTestIds(Set<String> ids) throws Exception {
         String url = API + "/repos/" + OWNER + "/" + REPO
                 + "/contents/" + KNOWN_IDS_PATH;
 
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-            // Re-fetch the latest SHA on every attempt so a 409 from a concurrent
-            // shard does not block subsequent retries.
             String sha = null;
             HttpResponse<String> getRes = HTTP.send(
                     buildGet(url + "?ref=" + BRANCH),
@@ -401,11 +384,10 @@ public class GitHubStore {
     }
 
     /**
-     * Builds an authenticated HTTP PUT request targeting the given GitHub API
-     * URL with the supplied JSON body.
+     * Builds an authenticated HTTP PUT request with the supplied JSON body.
      *
      * @param url the fully-qualified URL to request
-     * @param body the JSON-encoded request body to include in the PUT
+     * @param body the JSON-encoded request body
      * @return a configured {@link HttpRequest} ready to be sent
      */
     private static HttpRequest buildPut(String url, String body) {
@@ -419,15 +401,9 @@ public class GitHubStore {
     /**
      * Asserts that the given HTTP response indicates success (status 2xx).
      *
-     * <p>
-     * Throws a {@link RuntimeException} containing the operation context, the
-     * HTTP status code, and the full response body when the status falls
-     * outside the 200–299 range, giving callers enough detail to diagnose
-     * failures without needing to re-run with verbose logging.
-     *
      * @param res the HTTP response to validate
-     * @param ctx a short human-readable description of the operation being
-     * checked, used in the exception message
+     * @param ctx a short description of the operation, used in the exception
+     * message
      * @throws RuntimeException when the response status is not in the 2xx range
      */
     private static void assertOk(HttpResponse<String> res, String ctx) {
