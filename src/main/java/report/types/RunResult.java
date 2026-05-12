@@ -10,6 +10,7 @@ public record RunResult(
         String branch,
         String commitSha,
         String environment,
+        String runType,
         int totalTests,
         int passed,
         int failed,
@@ -18,4 +19,6 @@ public record RunResult(
         long duration,
         int newTests,
         List<TestResultRecord> tests
-) {}
+        ) {
+
+}
