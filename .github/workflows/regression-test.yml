@@ -113,9 +113,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6]
+        shard: [1, 2, 3]
     env:
       CI: true
+      # Marks every run written by a shard as "regression" so the monthly
+      # report ignores it.
+      RUN_TYPE: regression
       DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
       DATA_REPO_OWNER: Phillmon8917
       DATA_REPO_NAME: phptravels-reports
@@ -224,6 +227,9 @@ jobs:
     if: always()
     env:
       CI: true
+      # Marks the run written by BuildReport as "monthly" so it appears only
+      # in the monthly report and never in the regression report.
+      RUN_TYPE: monthly
       DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
       DATA_REPO_OWNER: Phillmon8917
       DATA_REPO_NAME: phptravels-reports

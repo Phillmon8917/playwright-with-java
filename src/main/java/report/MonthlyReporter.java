@@ -25,12 +25,24 @@ public class MonthlyReporter implements
         BeforeAllCallback, AfterAllCallback,
         BeforeEachCallback, AfterEachCallback {
 
-    private final List<TestResultRecord>  results        = Collections.synchronizedList(new ArrayList<>());
-    private final Map<String, Long>       testStartTimes = Collections.synchronizedMap(new HashMap<>());
-    private final Set<String>             currentTestIds = Collections.synchronizedSet(new HashSet<>());
+    /**
+     * Run type constant for regression runs — these are excluded from the
+     * monthly report and tracked separately in regression-runs.json.
+     */
+    public static final String TYPE_REGRESSION = "regression";
 
-    private long         startTime;
-    private Set<String>  previousTestIds = new HashSet<>();
+    /**
+     * Run type constant for monthly runs — these are the only runs included in
+     * the monthly report.
+     */
+    public static final String TYPE_MONTHLY = "monthly";
+
+    private final List<TestResultRecord> results = Collections.synchronizedList(new ArrayList<>());
+    private final Map<String, Long> testStartTimes = Collections.synchronizedMap(new HashMap<>());
+    private final Set<String> currentTestIds = Collections.synchronizedSet(new HashSet<>());
+
+    private long startTime;
+    private Set<String> previousTestIds = new HashSet<>();
 
     /**
      * Initializes the reporter state before all tests in the current scope run.
@@ -40,13 +52,14 @@ public class MonthlyReporter implements
      */
     @Override
     public void beforeAll(ExtensionContext ctx) throws Exception {
-        startTime       = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         previousTestIds = Store.loadKnownTestIds();
         LoggingUtil.info("[reporter] Known test IDs loaded: " + previousTestIds.size());
     }
 
     /**
-     * Records the start time and unique identifier for an individual test before execution.
+     * Records the start time and unique identifier for an individual test
+     * before execution.
      *
      * @param ctx the JUnit extension context for the test about to run
      */
@@ -58,30 +71,31 @@ public class MonthlyReporter implements
     }
 
     /**
-     * Captures the result details for a completed test and stores them for monthly reporting.
+     * Captures the result details for a completed test and stores them for
+     * monthly reporting.
      *
      * @param ctx the JUnit extension context for the completed test
      */
     @Override
     public void afterEach(ExtensionContext ctx) {
-        String id       = ctx.getUniqueId();
-        long   duration = System.currentTimeMillis()
+        String id = ctx.getUniqueId();
+        long duration = System.currentTimeMillis()
                 - testStartTimes.getOrDefault(id, startTime);
 
         String status = "passed";
-        String error  = null;
+        String error = null;
 
         if (ctx.getExecutionException().isPresent()) {
             Throwable ex = ctx.getExecutionException().get();
             status = (ex instanceof TestAbortedException) ? "skipped" : "failed";
-            error  = ex.getMessage();
+            error = ex.getMessage();
         }
 
         results.add(new TestResultRecord(
                 id,
                 ctx.getDisplayName(),
                 ctx.getParent().map(ExtensionContext::getDisplayName).orElse("")
-                        + " > " + ctx.getDisplayName(),
+                + " > " + ctx.getDisplayName(),
                 ctx.getTestClass().map(c -> c.getSimpleName() + ".java").orElse("unknown"),
                 ctx.getParent().map(ExtensionContext::getDisplayName).orElse("root"),
                 status,
@@ -94,7 +108,13 @@ public class MonthlyReporter implements
     }
 
     /**
-     * Aggregates the collected test results, persists the run summary, and updates known test identifiers.
+     * Aggregates the collected test results, persists the run summary, and
+     * updates known test identifiers.
+     * <p>
+     * The {@code RUN_TYPE} environment variable controls whether this run is
+     * stored as {@code "regression"} or {@code "monthly"}. The monthly report
+     * only ever reads back runs tagged {@code "monthly"}, so regression runs
+     * are invisible to it even though they share the same monthly JSON file.
      *
      * @param ctx the JUnit extension context for the current test container
      * @throws Exception if the report data cannot be persisted
@@ -103,27 +123,35 @@ public class MonthlyReporter implements
     public void afterAll(ExtensionContext ctx) throws Exception {
         long totalDuration = System.currentTimeMillis() - startTime;
 
-        long passed   = results.stream().filter(r -> "passed".equals(r.status())).count();
-        long failed   = results.stream().filter(r -> "failed".equals(r.status())).count();
-        long skipped  = results.stream().filter(r -> "skipped".equals(r.status())).count();
+        long passed = results.stream().filter(r -> "passed".equals(r.status())).count();
+        long failed = results.stream().filter(r -> "failed".equals(r.status())).count();
+        long skipped = results.stream().filter(r -> "skipped".equals(r.status())).count();
         long timedOut = results.stream().filter(r -> "timedOut".equals(r.status())).count();
         long newTests = results.stream().filter(TestResultRecord::isNew).count();
 
-        Calendar now   = Calendar.getInstance();
-        String month   = String.format("%d-%02d", now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1);
-        String date    = String.format("%d-%02d-%02d", now.get(Calendar.YEAR),
+        Calendar now = Calendar.getInstance();
+        String month = String.format("%d-%02d", now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1);
+        String date = String.format("%d-%02d-%02d", now.get(Calendar.YEAR),
                 now.get(Calendar.MONTH) + 1, now.get(Calendar.DAY_OF_MONTH));
 
-        String branch  = env("GITHUB_REF_NAME", gitCmd("git rev-parse --abbrev-ref HEAD"));
-        String rawSha  = env("GITHUB_SHA",      gitCmd("git rev-parse HEAD"));
-        String sha     = rawSha.length() > 7 ? rawSha.substring(0, 7) : rawSha;
-        String runId   = env("GITHUB_RUN_ID",   UUID.randomUUID().toString());
+        String branch = env("GITHUB_REF_NAME", gitCmd("git rev-parse --abbrev-ref HEAD"));
+        String rawSha = env("GITHUB_SHA", gitCmd("git rev-parse HEAD"));
+        String sha = rawSha.length() > 7 ? rawSha.substring(0, 7) : rawSha;
+        String runId = env("GITHUB_RUN_ID", UUID.randomUUID().toString());
         String environment = env("TEST_ENV", "main".equals(branch) ? "qa" : "develop");
+
+        // RUN_TYPE is set in the workflow. Regression shards set it to "regression".
+        // The monthly build step sets it to "monthly". Defaults to "monthly" so
+        // local runs are always included in the monthly report.
+        String runType = env("RUN_TYPE", TYPE_MONTHLY);
+
+        LoggingUtil.info("[reporter] Run type: " + runType);
 
         RunResult run = new RunResult(
                 runId,
                 now.toInstant().toString(),
                 date, month, branch, sha, environment,
+                runType,
                 results.size(),
                 (int) passed, (int) failed, (int) skipped, (int) timedOut,
                 totalDuration,
@@ -137,13 +165,15 @@ public class MonthlyReporter implements
         merged.addAll(currentTestIds);
         Store.saveKnownTestIds(merged);
 
-        LoggingUtil.info("[reporter] Run " + runId + " | Month: " + month
+        LoggingUtil.info("[reporter] Run " + runId + " | Type: " + runType
+                + " | Month: " + month
                 + " | Passed: " + passed + " | Failed: " + failed
                 + " | Skipped: " + skipped + " | New: " + newTests);
     }
 
     /**
-     * Returns the environment variable value for the supplied key or a fallback when it is blank.
+     * Returns the environment variable value for the supplied key or a fallback
+     * when it is blank.
      *
      * @param key the environment variable name to read
      * @param fallback the fallback value to use when the variable is missing
