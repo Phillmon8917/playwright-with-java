@@ -1,10 +1,10 @@
 package utils.storage;
 
-import utils.logger.LoggingUtil;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import utils.logger.LoggingUtil;
 
 public class StorageStateManager {
 
@@ -24,7 +24,8 @@ public class StorageStateManager {
      * Checks whether a storage state file exists for the supplied role.
      *
      * @param role the role whose storage state file should be checked
-     * @return {@code true} when the storage state file exists; otherwise {@code false}
+     * @return {@code true} when the storage state file exists; otherwise
+     * {@code false}
      */
     public static boolean storageExists(String role) {
         return Files.exists(getStoragePath(role));
@@ -53,5 +54,26 @@ public class StorageStateManager {
         } catch (Exception e) {
             LoggingUtil.error("Failed to delete storage state for " + role + ": " + e.getMessage());
         }
+    }
+
+    /**
+     * Returns the storage path for the given role, throwing clearly if the file
+     * does not exist. Call this from the @Before hook so a missing session
+     * produces an immediate, readable failure instead of a silent broken
+     * context.
+     *
+     * @param role the role whose storage state is required
+     * @return the path to the storage state file
+     * @throws IllegalStateException when the storage file does not exist
+     */
+    public static Path requireStoragePath(String role) {
+        Path path = getStoragePath(role);
+        if (!Files.exists(path)) {
+            throw new IllegalStateException(
+                    "Storage state for role '" + role + "' not found at: " + path.toAbsolutePath()
+                    + "\nRun the auth suite (AuthRunner) before running tests tagged @" + role + "."
+            );
+        }
+        return path;
     }
 }
