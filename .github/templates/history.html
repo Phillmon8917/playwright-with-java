@@ -213,6 +213,14 @@
         .stat-value.red   { color: var(--red); }
         .stat-value.yellow{ color: var(--yellow); }
 
+        .threshold-note {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: .06em;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
         .table-wrap {
             overflow-x: auto;
             border: 1px solid var(--border);
@@ -436,7 +444,7 @@
     <label>Pass rate threshold</label>
     <input type="range" min="0" max="100" value="80" step="1" id="thresholdSlider" oninput="onThresholdChange(this.value)" />
     <span class="threshold-val" id="thresholdVal">80%</span>
-    <span class="threshold-hint">— bars below this are red, within 10% are yellow, above are green</span>
+    <span class="threshold-hint">— runs below this threshold are shown as <strong style="color:var(--red)">Failed</strong>, at or above as <strong style="color:var(--green)">Passed</strong></span>
 </div>
 
 <div class="toolbar">
@@ -552,7 +560,19 @@
     function onThresholdChange(v) {
         threshold = parseInt(v);
         document.getElementById('thresholdVal').textContent = v + '%';
-        render();
+        // Re-apply filters because the status filter ("Passed"/"Failed") depends on threshold.
+        applyFilters();
+    }
+
+    /**
+     * Derives the effective status of a run based on the current threshold.
+     * A run passes only when its pass rate meets or exceeds the threshold.
+     * Failures/errors in the raw data always force a failed status regardless.
+     */
+    function effectiveStatus(run) {
+        const rate = parseFloat(run.passRate) || 0;
+        if ((run.failures || 0) > 0 || (run.errors || 0) > 0) return 'failed';
+        return rate >= threshold ? 'passed' : 'failed';
     }
 
     function barClass(rate) {
@@ -566,22 +586,29 @@
         const status  = document.getElementById('statusFilter').value;
         const trigger = document.getElementById('triggerFilter').value;
         const branch  = document.getElementById('branchFilter').value;
+
         filtered = allRuns.filter(r => {
             const matchQ = !q || r.id.toLowerCase().includes(q) ||
                 (r.branch||'').toLowerCase().includes(q) ||
                 (r.trigger||'').toLowerCase().includes(q) ||
                 (r.tag||'').toLowerCase().includes(q);
-            return matchQ &&
-                (!status  || r.status  === status) &&
+
+            // Status filter uses the threshold-derived status, not the stored one.
+            const matchStatus = !status || effectiveStatus(r) === status;
+
+            return matchQ && matchStatus &&
                 (!trigger || r.trigger === trigger) &&
                 (!branch  || r.branch  === branch);
         });
+
         sortData(); page = 1; render();
     }
 
     function sortData() {
         filtered.sort((a, b) => {
             let av = a[sortCol], bv = b[sortCol];
+            // When sorting by status, use the threshold-derived value.
+            if (sortCol === 'status') { av = effectiveStatus(a); bv = effectiveStatus(b); }
             if (sortCol === 'passRate') { av = parseFloat(av)||0; bv = parseFloat(bv)||0; }
             if (typeof av === 'number') return (av - bv) * sortDir;
             return String(av||'').localeCompare(String(bv||'')) * sortDir;
@@ -622,12 +649,14 @@
         }
 
         tbody.innerHTML = pageItems.map(r => {
-            const rate     = parseFloat(r.passRate) || 0;
-            const bc       = barClass(rate);
-            const dateStr  = r.date ? new Date(r.date).toLocaleString('en-ZA', { dateStyle:'medium', timeStyle:'short' }) : '—';
-            const failures = r.failures || 0;
-            const errors   = r.errors   || 0;
-            const skipped  = r.skipped  || 0;
+            const rate      = parseFloat(r.passRate) || 0;
+            const bc        = barClass(rate);
+            const status    = effectiveStatus(r);   // ← threshold-aware
+            const dateStr   = r.date ? new Date(r.date).toLocaleString('en-ZA', { dateStyle:'medium', timeStyle:'short' }) : '—';
+            const failures  = r.failures || 0;
+            const errors    = r.errors   || 0;
+            const skipped   = r.skipped  || 0;
+
             return '<tr>' +
                 '<td><input type="checkbox" class="cb" data-id="' + r.id + '" ' + (selected.has(r.id)?'checked':'') + ' onchange="toggleRow(\'' + r.id + '\',this)"/></td>' +
                 '<td><span class="run-id">' + r.id + '</span></td>' +
@@ -635,7 +664,7 @@
                 '<td><code style="font-size:12px;color:var(--accent)">' + (r.branch||'—') + '</code></td>' +
                 '<td><span class="badge-tag">' + (r.tag||'—') + '</span></td>' +
                 '<td><span class="badge-trigger ' + (r.trigger||'') + '">' + triggerLabel(r.trigger) + '</span></td>' +
-                '<td><span class="badge-status ' + (r.status||'') + '">' + (r.status==='passed'?'✅ Passed':'❌ Failed') + '</span></td>' +
+                '<td><span class="badge-status ' + status + '">' + (status==='passed'?'✅ Passed':'❌ Failed') + '</span></td>' +
                 '<td class="num">' + (r.tests||0) + '</td>' +
                 '<td class="num" style="color:var(--green)">' + (r.passed||0) + '</td>' +
                 '<td class="num" style="color:' + (failures>0?'var(--red)':'var(--muted)') + '">' + failures + '</td>' +
@@ -662,15 +691,17 @@
 
     function renderStats() {
         const total   = filtered.length;
-        const passed  = filtered.filter(r => r.status==='passed').length;
-        const failed  = filtered.filter(r => r.status==='failed').length;
+        // Stats also use threshold-aware status.
+        const passed  = filtered.filter(r => effectiveStatus(r) === 'passed').length;
+        const failed  = filtered.filter(r => effectiveStatus(r) === 'failed').length;
         const avgRate = total ? (filtered.reduce((s,r) => s+(parseFloat(r.passRate)||0), 0)/total).toFixed(1) : '0.0';
         const rateClass = parseFloat(avgRate) >= threshold ? 'green' : parseFloat(avgRate) >= threshold-10 ? 'yellow' : 'red';
+
         document.getElementById('statsBar').innerHTML =
             '<div class="stat"><div class="stat-label">Total Runs</div><div class="stat-value">' + total + '</div></div>' +
             '<div class="stat"><div class="stat-label">Passed</div><div class="stat-value green">' + passed + '</div></div>' +
             '<div class="stat"><div class="stat-label">Failed</div><div class="stat-value red">' + failed + '</div></div>' +
-            '<div class="stat"><div class="stat-label">Avg Pass Rate</div><div class="stat-value ' + rateClass + '">' + avgRate + '%</div></div>';
+            '<div class="stat"><div class="stat-label">Avg Pass Rate</div><div class="stat-value ' + rateClass + '">' + avgRate + '%</div><div class="threshold-note">threshold: ' + threshold + '%</div></div>';
     }
 
     function toggleRow(id, cb) { if(cb.checked) selected.add(id); else selected.delete(id); updateBulkUI(); }
