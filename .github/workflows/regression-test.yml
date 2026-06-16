@@ -7,8 +7,6 @@ permissions:
   id-token: write
 
 on:
-  schedule:
-    - cron: "0 3 * * *"
   workflow_dispatch:
     inputs:
       tag:

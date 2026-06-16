@@ -7,9 +7,6 @@ permissions:
   id-token: write
 
 on:
-  schedule:
-    - cron: "30 6 * * *"
-    - cron: "0 10 * * *"
   pull_request:
     branches:
       - develop
